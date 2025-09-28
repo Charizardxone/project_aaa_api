@@ -1,0 +1,171 @@
+package com.zm.blog;
+
+import com.zm.blog.dto.ArticleCreateRequest;
+import com.zm.blog.dto.ArticleEditRequest;
+import com.zm.blog.dto.ArticleResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+/**
+ * 文章集成测试类
+ */
+@SpringBootTest
+@AutoConfigureMockMvc
+class ArticleIntegrationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Test
+    void createArticleIntegrationTest() throws Exception {
+        // Arrange
+        ArticleCreateRequest request = new ArticleCreateRequest();
+        request.setTitle(\"集成测试标题\");
+        request.setContent(\"集成测试内容\");
+        request.setSummary(\"集成测试摘要\");
+
+        // Act & Assert
+        mockMvc.perform(post(\"/api/articles\")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(\"$.code\").value(0))
+                .andExpect(jsonPath(\"$.data.title\").value(\"集成测试标题\"))
+                .andExpect(jsonPath(\"$.data.content\").value(\"集成测试内容\"))
+                .andExpect(jsonPath(\"$.data.status\").value(\"draft\"));
+    }
+
+    @Test
+    void createArticleValidationTest() throws Exception {
+        // Arrange - 空标题
+        ArticleCreateRequest request = new ArticleCreateRequest();
+        request.setTitle(\"\");
+        request.setContent(\"内容\");
+        request.setSummary(\"摘要\");
+
+        // Act & Assert
+        mockMvc.perform(post(\"/api/articles\")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void createArticleContentLengthTest() throws Exception {
+        // Arrange - 内容过长
+        ArticleCreateRequest request = new ArticleCreateRequest();
+        request.setTitle(\"标题\");
+        request.setContent(\"a\".repeat(10001)); // 10001字符
+        request.setSummary(\"摘要\");
+
+        // Act & Assert
+        mockMvc.perform(post(\"/api/articles\")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void createAndGetArticleTest() throws Exception {
+        // Arrange
+        ArticleCreateRequest createRequest = new ArticleCreateRequest();
+        createRequest.setTitle(\"创建并获取测试\");
+        createRequest.setContent(\"创建并获取内容\");
+        createRequest.setSummary(\"创建并获取摘要\");
+
+        // 创建文章
+        String createResponse = mockMvc.perform(post(\"/api/articles\")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createRequest)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        // 解析响应获取ID
+        ObjectMapper mapper = new ObjectMapper();
+        ArticleResponse createdArticle = mapper.readTree(createResponse)
+                .get(\"data\").traverse(mapper).readValueAs(ArticleResponse.class);
+
+        // 获取文章
+        mockMvc.perform(get(\"/api/articles/\" + createdArticle.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(\"$.data.id\").value(createdArticle.getId()))
+                .andExpect(jsonPath(\"$.data.title\").value(\"创建并获取测试\"));
+    }
+
+    @Test
+    void editArticleIntegrationTest() throws Exception {
+        // 先创建文章
+        ArticleCreateRequest createRequest = new ArticleCreateRequest();
+        createRequest.setTitle(\"编辑前标题\");
+        createRequest.setContent(\"编辑前内容\");
+        createRequest.setSummary(\"编辑前摘要\");
+
+        String createResponse = mockMvc.perform(post(\"/api/articles\")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createRequest)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        ObjectMapper mapper = new ObjectMapper();
+        ArticleResponse createdArticle = mapper.readTree(createResponse)
+                .get(\"data\").traverse(mapper).readValueAs(ArticleResponse.class);
+
+        // 编辑文章
+        ArticleEditRequest editRequest = new ArticleEditRequest();
+        editRequest.setTitle(\"编辑后标题\");
+        editRequest.setContent(\"编辑后内容\");
+        editRequest.setSummary(\"编辑后摘要\");
+        editRequest.setTags(\"编辑后标签\");
+        editRequest.setUpdatedAt(createdArticle.getUpdatedAt());
+
+        mockMvc.perform(put(\"/api/articles/\" + createdArticle.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(editRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(\"$.data.title\").value(\"编辑后标题\"))
+                .andExpect(jsonPath(\"$.data.content\").value(\"编辑后内容\"));
+
+        // 验证编辑结果
+        mockMvc.perform(get(\"/api/articles/\" + createdArticle.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(\"$.data.title\").value(\"编辑后标题\"))
+                .andExpect(jsonPath(\"$.data.content\").value(\"编辑后内容\"));
+    }
+
+    @Test
+    void createArticleWithSpecialCharsTest() throws Exception {
+        // Arrange
+        ArticleCreateRequest request = new ArticleCreateRequest();
+        request.setTitle(\"<script>alert('xss')</script>安全标题\");
+        request.setContent(\"内容包含特殊字符&<>\\\"'\");
+        request.setSummary(\"摘要包含特殊字符\");
+        request.setTags(\"标签包含特殊字符\");
+
+        // Act & Assert
+        mockMvc.perform(post(\"/api/articles\")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(\"$.code\").value(0))
+                .andExpect(jsonPath(\"$.data.title\").exists())
+                .andExpect(jsonPath(\"$.data.content\").exists());
+    }
+
+    @Test
+    void getNonExistentArticleTest() throws Exception {
+        // Act & Assert
+        mockMvc.perform(get(\"/api/articles/99999\"))
+                .andExpect(status().isNotFound());
+    }
+}
