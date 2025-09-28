@@ -1,0 +1,11 @@
+2025-09-28T11:48:18.704+08:00  INFO 33253 --- [blog-article-service] [main] com.zm.blog.BlogApplication              : Starting BlogApplication v0.0.1-SNAPSHOT using Java 17.0.12 with PID 33253 (/home/yfc/project_dpap/dpap-workspace/project_aaa_api/target/blog-0.0.1-SNAPSHOT.jar started by yfc in /home/yfc/project_dpap/dpap-workspace/project_aaa_api)
+2025-09-28T11:48:18.709+08:00  INFO 33253 --- [blog-article-service] [main] com.zm.blog.BlogApplication              : The following 1 profile is active: "test"
+2025-09-28T11:48:20.235+08:00  INFO 33253 --- [blog-article-service] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8082 (http)
+2025-09-28T11:48:20.261+08:00  INFO 33253 --- [blog-article-service] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-09-28T11:48:20.262+08:00  INFO 33253 --- [blog-article-service] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.44]
+2025-09-28T11:48:20.319+08:00  INFO 33253 --- [blog-article-service] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2025-09-28T11:48:20.320+08:00  INFO 33253 --- [blog-article-service] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1520 ms
+2025-09-28T11:48:21.016+08:00  INFO 33253 --- [blog-article-service] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8082 (http) with context path '/api'
+2025-09-28T11:48:21.044+08:00  INFO 33253 --- [blog-article-service] [main] com.zm.blog.BlogApplication              : Started BlogApplication in 3.43 seconds (process running for 4.205)
+2025-09-28T11:48:26.841+08:00  INFO 33253 --- [blog-article-service] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-28T11:48:26.852+08:00  INFO 33253 --- [blog-article-service] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete

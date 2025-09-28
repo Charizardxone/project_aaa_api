@@ -1,5 +1,124 @@
+# =================================================================
+# Spring Boot Application Configuration - Blog Article Service
+# =================================================================
+
 spring:
-    application:
-        name: blog
+  application:
+    name: blog-article-service
+  profiles:
+    active: dev
+
+  # --- Database Configuration ---
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL:jdbc:mysql://localhost:3306/blog_db?useSSL=false&serverTimezone=UTC&characterEncoding=utf8}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
+
+  # --- JPA Configuration (Optional) ---
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+
+  # --- MyBatis-Plus Configuration ---
+  mybatis-plus:
+    configuration:
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    global-config:
+      db-config:
+        logic-delete-field: deleted
+        logic-delete-value: 1
+        logic-not-delete-value: 0
+
+  # --- Internationalization Configuration ---
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+
+  # --- Cross-Origin Resource Sharing (CORS) Configuration ---
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:8080}
+    allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,OPTIONS}
+    allowed-headers: ${CORS_ALLOWED_HEADERS:*}
+    allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}
+
+  # --- Validation Configuration ---
+  validation:
+    fail-fast: true
+
+  # --- Development Tools Configuration ---
+  devtools:
+    restart:
+      enabled: ${DEVTOOLS_ENABLED:false}
+      additional-paths: src/main/java
+  thymeleaf:
+    cache: ${THYMELEAF_CACHE:false}
+
+# --- Application Configuration ---
+app:
+  version: 0.1.0
+  name: Blog Article Service
+  description: 博客系统核心文章管理模块
+  author: DPAP Team
+  # --- JWT Configuration (Placeholder) ---
+  jwt:
+    secret: ${JWT_SECRET:your-secret-key-here}
+    expiration: ${JWT_EXPIRATION:86400}
+    header: ${JWT_HEADER:Authorization}
+    prefix: ${JWT_PREFIX:Bearer }
+  # --- File Upload Configuration ---
+  upload:
+    max-size: ${UPLOAD_MAX_SIZE:10485760}
+    allowed-types: ${UPLOAD_ALLOWED_TYPES:image/jpeg,image/png,image/gif}
+    path: ${UPLOAD_PATH:/uploads/}
+
+# --- Server Configuration ---
 server:
-    port: 8080
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: ${CONTEXT_PATH:/api}
+  tomcat:
+    max-threads: ${TOMCAT_MAX_THREADS:200}
+    min-spare-threads: ${TOMCAT_MIN_THREADS:10}
+    connection-timeout: ${TOMCAT_CONNECTION_TIMEOUT:20000}
+
+# --- Logging Configuration ---
+logging:
+  level:
+    root: ${LOG_LEVEL_ROOT:INFO}
+    com.zm.blog: ${LOG_LEVEL_APP:DEBUG}
+    org.springframework.web: ${LOG_LEVEL_WEB:INFO}
+    org.springframework.security: ${LOG_LEVEL_SECURITY:INFO}
+  file:
+    name: ${LOG_FILE:logs/blog-application.log}
+  logback:
+    rollingpolicy:
+      max-file-size: ${LOG_MAX_FILE_SIZE:10MB}
+      max-history: ${LOG_MAX_HISTORY:30}
+
+# --- Management Configuration (Actuator) ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  info:
+    git:
+      mode: full
+
+# --- Swagger/OpenAPI Configuration (Placeholder) ---
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: ${SWAGGER_ENABLED:true}
