@@ -129,8 +129,7 @@ cors:
   allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}
 
 # =============================================================================
-# MyBatis-Plus配置占位
-# 实际配置在各profile中定义
+# MyBatis-Plus配置
 # =============================================================================
 mybatis-plus:
   # Mapper接口对应的XML文件位置
@@ -148,7 +147,7 @@ mybatis-plus:
     # 多个resultMap关联
     aggressive-lazy-loading: false
     # 打印SQL日志
-    log-impl: ${MYBATIS_LOG_IMPL:org.apache.ibatis.logging.stdout.StdOutImpl}
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   # 全局配置
   global-config:
     # 数据库配置
