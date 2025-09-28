@@ -1,0 +1,171 @@
+# ===================================================================
+# 博客系统测试环境配置 (application-test.yml)
+# 环境：test
+# 特点：测试数据库、模拟数据、集成测试、性能监控
+# ===================================================================
+
+# --- 服务器配置 ---
+server:
+  port: 8081
+  servlet:
+    context-path: /api
+
+# --- 测试环境日志配置 ---
+logging:
+  level:
+    root: WARN
+    com.zm.blog: INFO
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+  file:
+    name: logs/blog-test.log
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 15
+
+# --- Spring 综合配置 ---
+spring:
+  # --- 数据源配置 ---
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:blog_test}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:test_user}
+    password: ${DB_PASSWORD:test123456}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 10
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+
+  # --- JPA/Hibernate 配置 ---
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  # --- 测试环境特殊配置 ---
+  thymeleaf:
+    cache: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  # --- 测试环境邮件配置 ---
+  mail:
+    host: ${MAIL_HOST:smtp.example.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:test@example.com}
+    password: ${MAIL_PASSWORD:test-email-password}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+  # --- 测试环境Redis配置 ---
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:test123456}
+    database: 1
+    lettuce:
+      pool:
+        max-active: 20
+        max-idle: 20
+        min-idle: 5
+        max-wait: 3000ms
+    timeout: 5000ms
+
+  # --- 测试环境缓存配置 ---
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000  # 1小时
+      cache-null-values: false
+
+  # --- 测试环境任务调度配置 ---
+  task:
+    scheduling:
+      pool:
+        size: 10
+    execution:
+      pool:
+        core-size: 5
+        max-size: 20
+        queue-capacity: 100
+        keep-alive: 60s
+        thread-name-prefix: test-task-
+
+# --- MyBatis-Plus 配置 ---
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  mapper-locations: classpath*:/mapper/**/*.xml
+
+# --- 测试环境跨域配置 ---
+app:
+  cors:
+    allowed-origins: http://test.example.com,http://localhost:3000
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: '*'
+    allow-credentials: true
+    max-age: 3600
+  file:
+    upload-path: /tmp/blog-test-uploads/
+    allowed-types: image/jpeg,image/png,image/gif,text/plain,application/pdf
+    max-size: 10485760  # 10MB
+
+# --- 测试环境JWT配置 ---
+jwt:
+  secret: ${JWT_SECRET:}
+  expiration: 3600000  # 1小时
+  refresh-expiration: 86400000  # 24小时
+
+# --- 测试环境Swagger配置 ---
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: false
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: false
+
+# --- 测试环境监控配置 ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+    env:
+      show-values: never
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      environment: test

@@ -1,0 +1,52 @@
+2025-09-28 14:37:58 [main] INFO  c.z.b.config.ApplicationConfigTest - Starting ApplicationConfigTest using Java 17.0.12 with PID 22770 (started by yfc in /home/yfc/project_dpap/dpap-workspace/project_aaa_api)
+2025-09-28 14:37:58 [main] DEBUG c.z.b.config.ApplicationConfigTest - Running with Spring Boot v3.5.5, Spring v6.2.10
+2025-09-28 14:37:58 [main] INFO  c.z.b.config.ApplicationConfigTest - The following 1 profile is active: "dev"
+2025-09-28 14:37:58 [main] DEBUG o.s.w.c.s.GenericWebApplicationContext - Refreshing org.springframework.web.context.support.GenericWebApplicationContext@759d81f3
+2025-09-28 14:37:59 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 2 mappings in 'requestMappingHandlerMapping'
+2025-09-28 14:37:59 [main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+2025-09-28 14:37:59 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-09-28 14:37:59 [main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-09-28 14:38:00 [main] INFO  c.z.b.config.ApplicationConfigTest - Started ApplicationConfigTest in 2.676 seconds (process running for 4.188)
+2025-09-28 14:38:01 [SpringApplicationShutdownHook] DEBUG o.s.w.c.s.GenericWebApplicationContext - Closing org.springframework.web.context.support.GenericWebApplicationContext@759d81f3, started on Sun Sep 28 14:37:58 CST 2025
+2025-09-28 14:39:07 [main] INFO  c.z.b.config.ConfigIntegrationTest - Starting ConfigIntegrationTest using Java 17.0.12 with PID 23492 (started by yfc in /home/yfc/project_dpap/dpap-workspace/project_aaa_api)
+2025-09-28 14:39:07 [main] DEBUG c.z.b.config.ConfigIntegrationTest - Running with Spring Boot v3.5.5, Spring v6.2.10
+2025-09-28 14:39:07 [main] INFO  c.z.b.config.ConfigIntegrationTest - The following 1 profile is active: "dev"
+2025-09-28 14:39:07 [main] DEBUG o.s.w.c.s.GenericWebApplicationContext - Refreshing org.springframework.web.context.support.GenericWebApplicationContext@a10c1b5
+2025-09-28 14:39:08 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 2 mappings in 'requestMappingHandlerMapping'
+2025-09-28 14:39:08 [main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+2025-09-28 14:39:08 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-09-28 14:39:09 [main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-09-28 14:39:09 [main] INFO  c.z.b.config.ConfigIntegrationTest - Started ConfigIntegrationTest in 2.341 seconds (process running for 3.819)
+2025-09-28 14:39:10 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.zm.blog.config.ApplicationConfigTest]: ApplicationConfigTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-09-28 14:39:10 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.zm.blog.BlogApplication for test class com.zm.blog.config.ApplicationConfigTest
+2025-09-28 14:39:10 [main] INFO  c.z.b.config.ApplicationConfigTest - Starting ApplicationConfigTest using Java 17.0.12 with PID 23492 (started by yfc in /home/yfc/project_dpap/dpap-workspace/project_aaa_api)
+2025-09-28 14:39:10 [main] DEBUG c.z.b.config.ApplicationConfigTest - Running with Spring Boot v3.5.5, Spring v6.2.10
+2025-09-28 14:39:10 [main] INFO  c.z.b.config.ApplicationConfigTest - The following 1 profile is active: "dev"
+2025-09-28 14:39:10 [main] DEBUG o.s.w.c.s.GenericWebApplicationContext - Refreshing org.springframework.web.context.support.GenericWebApplicationContext@34cd65ac
+2025-09-28 14:39:10 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 2 mappings in 'requestMappingHandlerMapping'
+2025-09-28 14:39:10 [main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+2025-09-28 14:39:10 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-09-28 14:39:10 [main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-09-28 14:39:10 [main] INFO  c.z.b.config.ApplicationConfigTest - Started ApplicationConfigTest in 0.542 seconds (process running for 5.653)
+2025-09-28 14:39:11 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.zm.blog.config.TestProfileConfigTest]: TestProfileConfigTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-09-28 14:39:11 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.zm.blog.BlogApplication for test class com.zm.blog.config.TestProfileConfigTest
+2025-09-28 14:39:11 [main] INFO  c.z.b.config.TestProfileConfigTest - Starting TestProfileConfigTest using Java 17.0.12 with PID 23492 (started by yfc in /home/yfc/project_dpap/dpap-workspace/project_aaa_api)
+2025-09-28 14:39:11 [main] INFO  c.z.b.config.TestProfileConfigTest - The following 1 profile is active: "test"
+2025-09-28 14:39:11 [main] INFO  c.z.b.config.TestProfileConfigTest - Started TestProfileConfigTest in 0.453 seconds (process running for 6.217)
+2025-09-28 14:39:11 [main] INFO  c.z.b.config.ProdProfileConfigTest - Starting ProdProfileConfigTest using Java 17.0.12 with PID 23492 (started by yfc in /home/yfc/project_dpap/dpap-workspace/project_aaa_api)
+2025-09-28 14:39:11 [main] INFO  c.z.b.config.ProdProfileConfigTest - The following 1 profile is active: "prod"
+2025-09-28 14:39:12 [main] INFO  c.z.b.config.ProdProfileConfigTest - Started ProdProfileConfigTest in 0.404 seconds (process running for 6.733)
+2025-09-28 14:39:12 [main] INFO  com.zm.blog.BlogApplicationTests - Starting BlogApplicationTests using Java 17.0.12 with PID 23492 (started by yfc in /home/yfc/project_dpap/dpap-workspace/project_aaa_api)
+2025-09-28 14:39:12 [main] DEBUG com.zm.blog.BlogApplicationTests - Running with Spring Boot v3.5.5, Spring v6.2.10
+2025-09-28 14:39:12 [main] INFO  com.zm.blog.BlogApplicationTests - The following 1 profile is active: "dev"
+2025-09-28 14:39:12 [main] DEBUG o.s.w.c.s.GenericWebApplicationContext - Refreshing org.springframework.web.context.support.GenericWebApplicationContext@4de158ca
+2025-09-28 14:39:12 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 2 mappings in 'requestMappingHandlerMapping'
+2025-09-28 14:39:12 [main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+2025-09-28 14:39:12 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-09-28 14:39:12 [main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-09-28 14:39:12 [main] INFO  com.zm.blog.BlogApplicationTests - Started BlogApplicationTests in 0.377 seconds (process running for 7.248)
+2025-09-28 14:39:12 [SpringApplicationShutdownHook] DEBUG o.s.w.c.s.GenericWebApplicationContext - Closing org.springframework.web.context.support.GenericWebApplicationContext@a10c1b5, started on Sun Sep 28 14:39:07 CST 2025
+2025-09-28 14:39:12 [SpringApplicationShutdownHook] DEBUG o.s.w.c.s.GenericWebApplicationContext - Closing org.springframework.web.context.support.GenericWebApplicationContext@34cd65ac, started on Sun Sep 28 14:39:10 CST 2025
+2025-09-28 14:39:12 [SpringApplicationShutdownHook] DEBUG o.s.w.c.s.GenericWebApplicationContext - Closing org.springframework.web.context.support.GenericWebApplicationContext@16b76858, started on Sun Sep 28 14:39:11 CST 2025
+2025-09-28 14:39:12 [SpringApplicationShutdownHook] DEBUG o.s.w.c.s.GenericWebApplicationContext - Closing org.springframework.web.context.support.GenericWebApplicationContext@5fa5c8cf, started on Sun Sep 28 14:39:11 CST 2025
+2025-09-28 14:39:12 [SpringApplicationShutdownHook] DEBUG o.s.w.c.s.GenericWebApplicationContext - Closing org.springframework.web.context.support.GenericWebApplicationContext@4de158ca, started on Sun Sep 28 14:39:12 CST 2025

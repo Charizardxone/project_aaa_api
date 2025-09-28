@@ -1,0 +1,251 @@
+# ===================================================================
+# 博客系统生产环境配置 (application-prod.yml)
+# 环境：production
+# 特点：高性能、高安全性、监控告警、容器化支持
+# ===================================================================
+
+# --- 服务器配置 ---
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: ${SERVER_CONTEXT_PATH:/api}
+  tomcat:
+    max-threads: 200
+    min-spare-threads: 20
+    max-connections: 10000
+    accept-count: 100
+    connection-timeout: 20000
+    max-http-post-size: 10485760  # 10MB
+
+# --- 生产环境日志配置 ---
+logging:
+  level:
+    root: WARN
+    com.zm.blog: INFO
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+  file:
+    name: ${LOG_FILE_PATH:/var/log/blog/blog-prod.log}
+  logback:
+    rollingpolicy:
+      max-file-size: 200MB
+      max-history: 30
+      total-size-cap: 10GB
+      clean-history-on-start: false
+      file-name-pattern: /var/log/blog/blog-prod.%d{yyyy-MM-dd}.%i.log
+
+# --- Spring 综合配置 ---
+spring:
+  # --- 数据源配置 ---
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT:3306}/${DB_NAME}?useUnicode=true&characterEncoding=utf8&useSSL=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_MAX_POOL_SIZE:50}
+      minimum-idle: ${DB_MIN_IDLE:20}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
+      connection-test-query: SELECT 1
+      pool-name: BlogHikariCP
+      leak-detection-threshold: 60000
+
+  # --- JPA/Hibernate 配置 ---
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        jdbc:
+          batch_size: 50
+          order_inserts: true
+          order_updates: true
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+
+  # --- 生产环境特殊配置 ---
+  main:
+    allow-bean-definition-overriding: false
+  thymeleaf:
+    cache: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  # --- 生产环境邮件配置 ---
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+  # --- 生产环境Redis配置 ---
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD}
+    database: ${REDIS_DATABASE:0}
+    lettuce:
+      pool:
+        max-active: ${REDIS_MAX_ACTIVE:50}
+        max-idle: ${REDIS_MAX_IDLE:50}
+        min-idle: ${REDIS_MIN_IDLE:10}
+        max-wait: ${REDIS_MAX_WAIT:3000ms}
+    timeout: ${REDIS_TIMEOUT:2000ms}
+    ssl: ${REDIS_SSL:false}
+
+  # --- 生产环境缓存配置 ---
+  cache:
+    type: redis
+    redis:
+      time-to-live: ${CACHE_TTL:3600000}  # 1小时
+      cache-null-values: false
+      key-prefix: "blog:"
+
+  # --- 生产环境任务调度配置 ---
+  task:
+    scheduling:
+      pool:
+        size: ${SCHEDULE_POOL_SIZE:10}
+    execution:
+      pool:
+        core-size: ${TASK_CORE_SIZE:10}
+        max-size: ${TASK_MAX_SIZE:50}
+        queue-capacity: ${TASK_QUEUE_CAPACITY:200}
+        keep-alive: ${TASK_KEEP_ALIVE:60s}
+        thread-name-prefix: blog-task-
+      shutdown:
+        await-termination: true
+        await-termination-period: 60s
+
+  # --- 生产环境安全配置 ---
+  security:
+    user:
+      name: ${ACTUATOR_USERNAME}
+      password: ${ACTUATOR_PASSWORD}
+    filter:
+      order: 10
+
+  # --- 生产环境健康检查配置 ---
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+# --- MyBatis-Plus 配置 ---
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    default-executor-type: reuse
+    local-cache-scope: statement
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      table-underline: true
+  mapper-locations: classpath*:/mapper/**/*.xml
+
+# --- 生产环境跨域配置 ---
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:https://www.example.com,https://admin.example.com}
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: ${CORS_ALLOWED_HEADERS:Authorization,Content-Type,Accept,X-Requested-With}
+    allow-credentials: true
+    max-age: 3600
+  file:
+    upload-path: ${FILE_UPLOAD_PATH:/app/uploads/}
+    allowed-types: ${FILE_ALLOWED_TYPES:image/jpeg,image/png,image/gif,text/plain,application/pdf}
+    max-size: ${FILE_MAX_SIZE:10485760}  # 10MB
+    cdn-url: ${CDN_URL:https://cdn.example.com/}
+
+# --- 生产环境JWT配置 ---
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:7200000}  # 2小时
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}  # 7天
+  issuer: ${JWT_ISSUER:blog.example.com}
+  audience: ${JWT_AUDIENCE:blog-users}
+
+# --- 生产环境Swagger配置 ---
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: ${SWAGGER_ENABLED:false}
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: ${SWAGGER_ENABLED:false}
+
+# --- 生产环境监控配置 ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+    env:
+      show-values: never
+    metrics:
+      enabled: true
+    prometheus:
+      roles: ACTUATOR
+  server:
+    port: ${MANAGEMENT_PORT:8081}
+    address: ${MANAGEMENT_ADDRESS:127.0.0.1}
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: blog-article-service
+      environment: production
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true
+
+# --- 生产环境应用信息 ---
+info:
+  app:
+    name: blog-article-service
+    version: ${APP_VERSION:0.1.0}
+    description: 博客系统核心文章管理模块
+  build:
+    time: ${BUILD_TIME:}
+    version: ${BUILD_VERSION:}
+    artifact: ${BUILD_ARTIFACT:}
+  java:
+    version: ${JAVA_VERSION:17}
+    vendor: ${JAVA_VENDOR:}
+    runtime: ${JAVA_RUNTIME:}
