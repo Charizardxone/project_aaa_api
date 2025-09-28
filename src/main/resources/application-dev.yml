@@ -1,0 +1,176 @@
+# =============================================================================
+# Blog Article Service - Development Environment Configuration
+# =============================================================================
+# 开发环境配置文件 (application-dev.yml)
+# 用于本地开发环境，提供详细的调试信息和开发便利性
+# =============================================================================
+
+# --- 服务器配置 ---
+server:
+  # 开发环境端口
+  port: 8080
+  # 开发环境绑定地址
+  address: 0.0.0.0
+  # Servlet配置
+  servlet:
+    context-path: /
+
+# --- 日志配置 ---
+logging:
+  # 开发环境日志级别
+  level:
+    root: INFO
+    com.zm.blog: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  # 日志文件配置
+  file:
+    name: logs/blog-article-service-dev.log
+  # 开发环境启用控制台彩色日志
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %clr(%-5level){green} %clr(%logger{36}){cyan} - %msg%n"
+
+# --- 数据源配置 ---
+spring:
+  datasource:
+    # 开发环境数据库配置（使用H2内存数据库）
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: ${DB_PASSWORD:}  # 开发环境可为空
+    driver-class-name: org.h2.Driver
+    # H2数据库控制台配置
+    hikari:
+      pool-name: BlogHikariPool-Dev
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+
+  # H2数据库配置
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        trace: true
+        web-allow-others: true
+
+  # JPA/Hibernate配置
+  jpa:
+    hibernate:
+      # 开发环境自动创建数据库结构
+      ddl-auto: create-drop
+    show-sql: true
+    format-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        type: trace
+
+  # --- 开发环境特有配置 ---
+  devtools:
+    # 开发工具配置
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+      exclude: static/**,templates/**
+    livereload:
+      enabled: true
+
+  # --- 模板引擎配置（如果使用Thymeleaf）---
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    encoding: UTF-8
+    mode: HTML
+
+  # --- 静态资源配置 ---
+  web:
+    resources:
+      static-locations:
+        - classpath:/static/
+        - classpath:/public/
+        - classpath:/resources/
+        - classpath:/META-INF/resources/
+
+  # --- 安全配置 ---
+  security:
+    user:
+      name: ${DEV_SECURITY_USER:admin}
+      password: ${DEV_SECURITY_PASSWORD:admin123}
+      roles: ADMIN
+
+  # --- 国际化配置 ---
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+
+# --- MyBatis-Plus配置 ---
+mybatis-plus:
+  configuration:
+    # 开发环境启用SQL日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      # 开发环境逻辑删除配置
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# --- Swagger/OpenAPI配置 ---
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+# --- 跨域配置 ---
+cors:
+  allowed-origins: "*"
+  allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
+  allowed-headers: "*"
+  allow-credentials: true
+
+# --- 管理端点配置 ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    info:
+      enabled: true
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+
+# --- 文件上传配置 ---
+file:
+  upload:
+    max-size: 10MB
+    allowed-types: "image/jpeg,image/png,image/gif,text/plain,application/pdf"
+    base-path: "uploads/"
+
+# --- 业务配置 ---
+blog:
+  article:
+    max-content-length: 1000000
+    max-title-length: 200
+    max-summary-length: 500
+  pagination:
+    default-size: 10
+    max-size: 100
+
+# --- 调试配置 ---
+debug: true
+trace: true

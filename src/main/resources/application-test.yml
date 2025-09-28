@@ -1,0 +1,197 @@
+# =============================================================================
+# Blog Article Service - Testing Environment Configuration
+# =============================================================================
+# 测试环境配置文件 (application-test.yml)
+# 用于自动化测试环境，提供测试专用的配置和设置
+# =============================================================================
+
+# --- 服务器配置 ---
+server:
+  # 测试环境端口（避免与开发环境冲突）
+  port: 8081
+  # 测试环境绑定地址
+  address: 0.0.0.0
+  # Servlet配置
+  servlet:
+    context-path: /
+
+# --- 日志配置 ---
+logging:
+  # 测试环境日志级别
+  level:
+    root: WARN
+    com.zm.blog: INFO
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.hibernate.SQL: INFO
+    org.testcontainers: INFO
+  # 日志文件配置
+  file:
+    name: logs/blog-article-service-test.log
+  # 测试环境日志格式
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# --- 数据源配置 ---
+spring:
+  datasource:
+    # 测试环境数据库配置（使用TestContainers或专用测试数据库）
+    url: ${TEST_DB_URL:jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${TEST_DB_USERNAME:sa}
+    password: ${TEST_DB_PASSWORD:}  # 测试环境密码
+    driver-class-name: ${TEST_DB_DRIVER:org.h2.Driver}
+    # 测试环境连接池配置
+    hikari:
+      pool-name: BlogHikariPool-Test
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+
+  # H2数据库配置（仅在使用H2时启用）
+  h2:
+    console:
+      enabled: ${TEST_H2_CONSOLE_ENABLED:false}
+      path: /h2-console
+      settings:
+        trace: false
+        web-allow-others: false
+
+  # JPA/Hibernate配置
+  jpa:
+    hibernate:
+      # 测试环境数据库策略
+      ddl-auto: ${TEST_JPA_DDL_AUTO:create-drop}
+    show-sql: ${TEST_JPA_SHOW_SQL:false}
+    format-sql: ${TEST_JPA_FORMAT_SQL:true}
+    properties:
+      hibernate:
+        format_sql: ${TEST_JPA_FORMAT_SQL:true}
+        use_sql_comments: ${TEST_JPA_SQL_COMMENTS:false}
+        type: warn
+
+  # --- 测试环境特有配置 ---
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+
+  # --- 缓存配置 ---
+  cache:
+    type: simple
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=10m
+
+  # --- 安全配置 ---
+  security:
+    user:
+      name: ${TEST_SECURITY_USER:test}
+      password: ${TEST_SECURITY_PASSWORD:test123}
+      roles: TEST
+
+  # --- 静态资源配置 ---
+  web:
+    resources:
+      static-locations:
+        - classpath:/static/
+        - classpath:/public/
+        - classpath:/resources/
+
+# --- MyBatis-Plus配置 ---
+mybatis-plus:
+  configuration:
+    # 测试环境SQL日志配置
+    log-impl: ${TEST_MYBATIS_LOG_IMPL:org.apache.ibatis.logging.nologging.NoLoggingImpl}
+  global-config:
+    db-config:
+      # 测试环境逻辑删除配置
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# --- Swagger/OpenAPI配置 ---
+springdoc:
+  api-docs:
+    enabled: ${TEST_SWAGGER_ENABLED:true}
+  swagger-ui:
+    enabled: ${TEST_SWAGGER_ENABLED:true}
+
+# --- 跨域配置 ---
+cors:
+  allowed-origins: "${TEST_CORS_ALLOWED_ORIGINS:*}"
+  allowed-methods: "${TEST_CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,OPTIONS}"
+  allowed-headers: "${TEST_CORS_ALLOWED_HEADERS:*}"
+  allow-credentials: ${TEST_CORS_ALLOW_CREDENTIALS:true}
+
+# --- 管理端点配置 ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,prometheus"
+  endpoint:
+    health:
+      show-details: when-authorized
+    info:
+      enabled: true
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+
+# --- 文件上传配置 ---
+file:
+  upload:
+    max-size: ${TEST_FILE_UPLOAD_MAX_SIZE:1MB}
+    allowed-types: "${TEST_FILE_ALLOWED_TYPES:image/jpeg,image/png,image/gif,text/plain}"
+    base-path: "test-uploads/"
+
+# --- 业务配置 ---
+blog:
+  article:
+    max-content-length: ${TEST_ARTICLE_MAX_CONTENT:100000}
+    max-title-length: ${TEST_ARTICLE_MAX_TITLE:200}
+    max-summary-length: ${TEST_ARTICLE_MAX_SUMMARY:500}
+  pagination:
+    default-size: ${TEST_PAGINATION_DEFAULT_SIZE:10}
+    max-size: ${TEST_PAGINATION_MAX_SIZE:50}
+
+# --- 国际化配置 ---
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+
+# --- 测试配置 ---
+test:
+  # 测试数据配置
+  data:
+    # 是否初始化测试数据
+    init-test-data: ${TEST_INIT_DATA:true}
+    # 测试数据文件路径
+    data-file: "classpath:test-data.sql"
+
+  # 性能测试配置
+  performance:
+    # 是否启用性能测试模式
+    enabled: ${TEST_PERFORMANCE_ENABLED:false}
+    # 性能测试线程数
+    threads: ${TEST_PERFORMANCE_THREADS:10}
+    # 性能测试持续时间
+    duration: ${TEST_PERFORMANCE_DURATION:30s}
+
+  # 集成测试配置
+  integration:
+    # 是否启用集成测试
+    enabled: ${TEST_INTEGRATION_ENABLED:true}
+    # 测试超时时间
+    timeout: ${TEST_INTEGRATION_TIMEOUT:30s}
+    # 是否重试失败的测试
+    retry-failed: ${TEST_INTEGRATION_RETRY:false}
+
+# --- 调试配置 ---
+debug: ${TEST_DEBUG_ENABLED:false}
+trace: ${TEST_TRACE_ENABLED:false}
