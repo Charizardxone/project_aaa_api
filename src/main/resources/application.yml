@@ -1,5 +1,59 @@
+# ===================================================================
+# 博客系统核心文章管理模块 - 主配置文件
+# 应用名称：blog-article-service
+# ===================================================================
+
+# --- 基础应用配置 ---
 spring:
-    application:
-        name: blog
-server:
-    port: 8080
+  application:
+    name: blog-article-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  # --- 国际化配置 ---
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+  # --- 文件上传配置 ---
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+      enabled: true
+  # --- 缓存配置 ---
+  cache:
+    type: simple
+    cache-names: article-cache, user-cache
+
+# --- 全局应用配置 ---
+app:
+  version: 0.1.0
+  title: 博客系统核心文章管理模块
+  description: 提供文章创建、编辑、发布等核心功能的REST API服务
+  author: DPAP Team
+  # 全局配置开关
+  features:
+    enable-swagger: ${APP_ENABLE_SWAGGER:true}
+    enable-cors: ${APP_ENABLE_CORS:true}
+    enable-actuator: ${APP_ENABLE_ACTUATOR:true}
+
+# --- 基础日志配置 ---
+logging:
+  level:
+    root: INFO
+    com.zm.blog: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# --- 管理端点配置 ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,env,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  server:
+    port: ${MANAGEMENT_PORT:8081}
