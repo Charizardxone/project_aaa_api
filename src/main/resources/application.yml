@@ -1,5 +1,213 @@
+# =============================================================================
+# Blog Article Service - Main Application Configuration
+# =============================================================================
+# 项目基础配置文件，定义通用配置和profile激活策略
+# 所有环境特定的配置在对应的profile文件中定义
+# =============================================================================
+
 spring:
-    application:
-        name: blog
+  # --- 基础应用配置 ---
+  application:
+    name: blog-article-service
+
+  # --- Profile激活配置 ---
+  # 支持通过命令行参数、环境变量或此处直接指定
+  # 推荐使用命令行: --spring.profiles.active=dev/test/prod
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  # --- 国际化配置 ---
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+
+  # --- 数据源配置占位 ---
+  # 实际配置在各profile中定义
+  datasource:
+    # 数据库连接池类型
+    hikari:
+      pool-name: BlogHikariPool
+      # 连接池大小配置
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:20}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      # 连接超时配置
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:30000}
+      # 空闲连接超时配置
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      # 连接最大生命周期
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
+      # 连接测试查询
+      connection-test-query: ${DB_TEST_QUERY:SELECT 1}
+
+  # --- Swagger/OpenAPI配置占位 ---
+  # 实际配置在各profile中定义
+  springdoc:
+    # API文档配置
+    api-docs:
+      path: /api-docs
+      enabled: ${SWAGGER_ENABLED:true}
+    # Swagger UI配置
+    swagger-ui:
+      path: /swagger-ui.html
+      enabled: ${SWAGGER_ENABLED:true}
+    # 包扫描配置
+    packages-to-scan: com.zm.blog.controller
+    # 基础信息配置
+    info:
+      title: 博客文章管理API
+      description: 博客系统核心文章管理模块API文档
+      version: ${app.version}
+
+# =============================================================================
+# 应用基础配置
+# =============================================================================
+app:
+  # 应用版本信息
+  version: 0.1.0
+  # 应用描述
+  description: 博客系统核心文章管理模块
+  # 应用环境标识
+  env: ${spring.profiles.active}
+
+# =============================================================================
+# 服务器配置
+# =============================================================================
 server:
-    port: 8080
+  # 基础端口配置，具体端口在各profile中覆盖
+  port: ${SERVER_PORT:8080}
+  # 服务器地址绑定
+  address: ${SERVER_ADDRESS:0.0.0.0}
+  # Servlet配置
+  servlet:
+    context-path: ${SERVER_CONTEXT_PATH:/}
+
+# =============================================================================
+# 日志配置
+# =============================================================================
+logging:
+  # 日志级别配置 - 各环境可覆盖
+  level:
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    com.zm.blog: ${LOGGING_LEVEL_APP:DEBUG}
+    org.springframework.web: ${LOGGING_LEVEL_WEB:INFO}
+  # 日志文件配置
+  file:
+    name: ${LOGGING_FILE:logs/blog-article-service.log}
+  # 日志格式
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# =============================================================================
+# 管理端点配置
+# =============================================================================
+management:
+  # 端点启用配置
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  # 端点基础路径
+  endpoint:
+    health:
+      show-details: when-authorized
+  # 健康检查配置
+  health:
+    db:
+      enabled: true
+    diskspace:
+      enabled: true
+
+# =============================================================================
+# 跨域配置占位
+# =============================================================================
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
+  allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,OPTIONS}
+  allowed-headers: ${CORS_ALLOWED_HEADERS:*}
+  allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}
+
+# =============================================================================
+# MyBatis-Plus配置
+# =============================================================================
+mybatis-plus:
+  # Mapper接口对应的XML文件位置
+  mapper-locations: classpath:mapper/*.xml
+  # 实体类包路径
+  type-aliases-package: com.zm.blog.entity
+  # 配置文件
+  configuration:
+    # 驼峰命名转换
+    map-underscore-to-camel-case: true
+    # 缓存配置
+    cache-enabled: true
+    # 延迟加载
+    lazy-loading-enabled: true
+    # 多个resultMap关联
+    aggressive-lazy-loading: false
+    # 打印SQL日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  # 全局配置
+  global-config:
+    # 数据库配置
+    db-config:
+      # 主键类型
+      id-type: auto
+      # 逻辑删除配置
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# =============================================================================
+# JWT配置占位
+# 实际配置在各profile中定义
+# =============================================================================
+jwt:
+  # 密钥配置（必须通过环境变量注入，禁止硬编码）
+  secret: ${JWT_SECRET:placeholder-secret-key-change-in-production}
+  # 过期时间配置
+  access-token-expiration: ${JWT_ACCESS_EXPIRATION:86400000}  # 24小时
+  refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:604800000}  # 7天
+  # Token前缀
+  token-prefix: ${JWT_TOKEN_PREFIX:Bearer }
+
+# =============================================================================
+# 文件上传配置
+# =============================================================================
+file:
+  upload:
+    # 上传文件大小限制
+    max-size: ${FILE_UPLOAD_MAX_SIZE:10MB}
+    # 允许的文件类型
+    allowed-types: ${FILE_ALLOWED_TYPES:image/jpeg,image/png,image/gif,text/plain}
+    # 上传目录
+    base-path: ${FILE_UPLOAD_BASE_PATH:uploads/}
+
+# =============================================================================
+# 业务配置
+# =============================================================================
+blog:
+  # 文章相关配置
+  article:
+    # 文章内容最大长度
+    max-content-length: ${BLOG_ARTICLE_MAX_CONTENT:1000000}
+    # 文章标题最大长度
+    max-title-length: ${BLOG_ARTICLE_MAX_TITLE:200}
+    # 文章摘要最大长度
+    max-summary-length: ${BLOG_ARTICLE_MAX_SUMMARY:500}
+    # 文章状态定义
+    status:
+      draft: DRAFT
+      published: PUBLISHED
+      archived: ARCHIVED
+  # 分页配置
+  pagination:
+    # 默认页大小
+    default-size: ${BLOG_PAGINATION_DEFAULT_SIZE:10}
+    # 最大页大小
+    max-size: ${BLOG_PAGINATION_MAX_SIZE:100}
+    # 页码参数名
+    page-param: page
+    # 大小参数名
+    size-param: size

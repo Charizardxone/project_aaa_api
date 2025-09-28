@@ -1,0 +1,271 @@
+# =============================================================================
+# Blog Article Service - Production Environment Configuration
+# =============================================================================
+# 生产环境配置文件 (application-prod.yml)
+# 用于生产环境，提供安全、稳定、高性能的配置设置
+# =============================================================================
+
+# --- 服务器配置 ---
+server:
+  # 生产环境端口
+  port: ${SERVER_PORT:8080}
+  # 生产环境绑定地址
+  address: ${SERVER_ADDRESS:0.0.0.0}
+  # Servlet配置
+  servlet:
+    context-path: ${SERVER_CONTEXT_PATH:/}
+  # 生产环境HTTP配置
+  tomcat:
+    # 最大线程数
+    max-threads: ${SERVER_MAX_THREADS:200}
+    # 最小线程数
+    min-spare-threads: ${SERVER_MIN_THREADS:10}
+    # 连接超时
+    connection-timeout: ${SERVER_CONNECTION_TIMEOUT:20000}
+    # 最大连接数
+    max-connections: ${SERVER_MAX_CONNECTIONS:10000}
+    # 接受队列大小
+    accept-count: ${SERVER_ACCEPT_COUNT:100}
+    # 启用压缩
+    compression:
+      enabled: ${SERVER_COMPRESSION_ENABLED:true}
+      mime-types: ${SERVER_COMPRESSION_MIME_TYPES:text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json}
+      min-response-size: ${SERVER_COMPRESSION_MIN_SIZE:2048}
+
+# --- 日志配置 ---
+logging:
+  # 生产环境日志级别
+  level:
+    root: ${LOGGING_LEVEL_ROOT:WARN}
+    com.zm.blog: ${LOGGING_LEVEL_APP:INFO}
+    org.springframework.web: ${LOGGING_LEVEL_WEB:WARN}
+    org.springframework.security: ${LOGGING_LEVEL_SECURITY:WARN}
+  # 日志文件配置
+  file:
+    name: ${LOGGING_FILE:/var/log/blog-article-service/application.log}
+    # 日志文件大小限制
+    max-size: ${LOGGING_FILE_MAX_SIZE:100MB}
+    # 日志文件保留天数
+    max-history: ${LOGGING_FILE_MAX_HISTORY:30}
+    # 日志文件总大小限制
+    total-size-cap: ${LOGGING_FILE_TOTAL_CAP:1GB}
+  # 生产环境日志格式
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  # 生产环境日志归档配置
+  logback:
+    rollingpolicy:
+      clean-history-on-start: ${LOGGING_CLEAN_HISTORY_ON_START:false}
+      max-file-size: ${LOGGING_MAX_FILE_SIZE:100MB}
+      file-name-pattern: ${LOGGING_FILE_NAME_PATTERN:logs/application-%d{yyyy-MM-dd}.%i.log}
+
+# --- 数据源配置 ---
+spring:
+  datasource:
+    # 生产环境数据库配置（必须通过环境变量注入）
+    url: ${DB_URL:jdbc:mysql://localhost:3306/blog_prod?useSSL=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
+    username: ${DB_USERNAME:blog_user}
+    password: ${DB_PASSWORD:}  # 必须通过环境变量注入
+    driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
+    # 生产环境连接池配置
+    hikari:
+      pool-name: BlogHikariPool-Prod
+      # 连接池大小配置
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:50}
+      minimum-idle: ${DB_POOL_MIN_IDLE:10}
+      # 连接超时配置
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:30000}
+      # 空闲连接超时配置
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      # 连接最大生命周期
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
+      # 连接泄漏检测
+      leak-detection-threshold: ${DB_LEAK_DETECTION_THRESHOLD:60000}
+      # 连接测试查询
+      connection-test-query: ${DB_TEST_QUERY:SELECT 1}
+      # 连接验证超时
+      validation-timeout: ${DB_VALIDATION_TIMEOUT:5000}
+
+  # JPA/Hibernate配置
+  jpa:
+    hibernate:
+      # 生产环境数据库策略（禁止自动创建）
+      ddl-auto: ${JPA_DDL_AUTO:validate}
+    show-sql: ${JPA_SHOW_SQL:false}
+    format-sql: ${JPA_FORMAT_SQL:false}
+    properties:
+      hibernate:
+        dialect: ${HIBERNATE_DIALECT:org.hibernate.dialect.MySQL8Dialect}
+        format_sql: ${JPA_FORMAT_SQL:false}
+        use_sql_comments: ${JPA_SQL_COMMENTS:false}
+        # 生产环境二级缓存配置
+        cache:
+          use_second_level_cache: ${HIBERNATE_SECOND_LEVEL_CACHE:true}
+          use_query_cache: ${HIBERNATE_QUERY_CACHE:true}
+          region:
+            factory_class: ${HIBERNATE_CACHE_FACTORY:org.hibernate.cache.ehcache.EhCacheRegionFactory}
+        # 统计信息配置
+        generate_statistics: ${HIBERNATE_STATISTICS:false}
+
+  # --- 生产环境特有配置 ---
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+
+  # --- 缓存配置 ---
+  cache:
+    type: ${CACHE_TYPE:caffeine}
+    caffeine:
+      spec: ${CACHE_SPEC:maximumSize=1000,expireAfterWrite=1h}
+    redis:
+      time-to-live: ${REDIS_TTL:1h}
+      cache-null-values: ${REDIS_CACHE_NULL:false}
+
+  # --- JMX配置 ---
+  jmx:
+    enabled: ${JMX_ENABLED:false}
+
+  # --- Actuator安全配置 ---
+  security:
+    enabled: ${ACTUATOR_SECURITY_ENABLED:true}
+
+  # --- 静态资源配置 ---
+  web:
+    resources:
+      static-locations:
+        - file:${STATIC_FILES_PATH:/var/www/static/}
+        - classpath:/static/
+      add-mappings: ${STATIC_RESOURCES_ENABLED:true}
+      cache:
+        cachecontrol:
+          max-age: ${STATIC_CACHE_MAX_AGE:86400}  # 24小时
+
+# --- MyBatis-Plus配置 ---
+mybatis-plus:
+  configuration:
+    # 生产环境SQL日志配置（生产环境建议关闭）
+    log-impl: ${MYBATIS_LOG_IMPL:org.apache.ibatis.logging.nologging.NoLoggingImpl}
+  global-config:
+    db-config:
+      # 生产环境逻辑删除配置
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# --- Swagger/OpenAPI配置 ---
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:false}
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:false}
+
+# --- 跨域配置 ---
+cors:
+  allowed-origins: "${CORS_ALLOWED_ORIGINS:}"  # 生产环境必须明确指定
+  allowed-methods: "${CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,OPTIONS}"
+  allowed-headers: "${CORS_ALLOWED_HEADERS:Content-Type,Authorization}"
+  allow-credentials: ${CORS_ALLOW_CREDENTIALS:false}
+
+# --- 管理端点配置 ---
+management:
+  # 管理端点基础路径
+  context-path: ${MANAGEMENT_CONTEXT_PATH:/actuator}
+  endpoints:
+    web:
+      exposure:
+        include: ${MANAGEMENT_ENDPOINTS_EXPOSE:health,info,metrics,prometheus}
+      # 端点基础路径
+      base-path: ${MANAGEMENT_BASE_PATH:/actuator}
+  endpoint:
+    health:
+      show-details: ${MANAGEMENT_HEALTH_SHOW_DETAILS:never}
+      probes:
+        enabled: ${MANAGEMENT_HEALTH_PROBES_ENABLED:true}
+    info:
+      enabled: ${MANAGEMENT_INFO_ENABLED:true}
+    metrics:
+      enabled: ${MANAGEMENT_METRICS_ENABLED:true}
+    prometheus:
+      enabled: ${MANAGEMENT_PROMETHEUS_ENABLED:true}
+  # 健康检查配置
+  health:
+    db:
+      enabled: ${MANAGEMENT_HEALTH_DB_ENABLED:true}
+    diskspace:
+      enabled: ${MANAGEMENT_HEALTH_DISK_ENABLED:true}
+    ping:
+      enabled: ${MANAGEMENT_HEALTH_PING_ENABLED:true}
+    # 自定义健康检查
+    circuitbreakers:
+      enabled: ${MANAGEMENT_HEALTH_CIRCUITBREAKERS_ENABLED:false}
+    livenessstate:
+      enabled: ${MANAGEMENT_HEALTH_LIVENESS_ENABLED:true}
+    readinessstate:
+      enabled: ${MANAGEMENT_HEALTH_READINESS_ENABLED:true}
+
+# --- 文件上传配置 ---
+file:
+  upload:
+    max-size: ${FILE_UPLOAD_MAX_SIZE:5MB}
+    allowed-types: "${FILE_ALLOWED_TYPES:image/jpeg,image/png,image/gif}"
+    base-path: "${FILE_UPLOAD_BASE_PATH:/var/www/uploads/}"
+
+# --- 业务配置 ---
+blog:
+  article:
+    max-content-length: ${BLOG_ARTICLE_MAX_CONTENT:500000}
+    max-title-length: ${BLOG_ARTICLE_MAX_TITLE:200}
+    max-summary-length: ${BLOG_ARTICLE_MAX_SUMMARY:500}
+  pagination:
+    default-size: ${BLOG_PAGINATION_DEFAULT_SIZE:20}
+    max-size: ${BLOG_PAGINATION_MAX_SIZE:100}
+
+# --- 国际化配置 ---
+spring:
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+
+# --- 监控配置 ---
+micrometer:
+  # 监控指标导出
+  export:
+    prometheus:
+      enabled: ${PROMETHEUS_ENABLED:true}
+      step: ${PROMETHEUS_STEP:1m}
+  # 监控标签
+  tags:
+    application: ${spring.application.name}
+    environment: ${spring.profiles.active}
+    region: ${REGION:default}
+
+# --- 调试配置 ---
+debug: false
+trace: false
+
+# --- 安全配置 ---
+security:
+  # 生产环境必须配置JWT
+  jwt:
+    # JWT密钥（必须通过环境变量注入）
+    secret: ${JWT_SECRET:}
+    # JWT过期时间
+    access-token-expiration: ${JWT_ACCESS_EXPIRATION:3600000}  # 1小时
+    refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:86400000}  # 24小时
+
+# --- 性能配置 ---
+# 生产环境JVM参数建议（需要在启动时设置）
+# java -Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -jar app.jar --spring.profiles.active=prod
+
+# --- 容器化配置 ---
+# 生产环境容器建议配置
+# JAVA_OPTS: "-Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
+# SPRING_PROFILES_ACTIVE: "prod"
+# DB_URL: "jdbc:mysql://db-host:3306/blog_prod?useSSL=true..."
+# DB_USERNAME: "blog_user"
+# DB_PASSWORD: "secure_password"
+# JWT_SECRET: "very_secure_jwt_secret_key"

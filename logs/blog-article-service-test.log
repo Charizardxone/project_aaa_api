@@ -1,0 +1,6 @@
+2025-09-28 15:50:57 [main] INFO  com.zm.blog.BlogApplication - Starting BlogApplication v0.0.1-SNAPSHOT using Java 17.0.12 with PID 30462 (/home/yfc/project_dpap/dpap-workspace/project_aaa_api/target/blog-0.0.1-SNAPSHOT.jar started by yfc in /home/yfc/project_dpap/dpap-workspace/project_aaa_api)
+2025-09-28 15:50:57 [main] INFO  com.zm.blog.BlogApplication - The following 1 profile is active: "test"
+2025-09-28 15:50:59 [main] INFO  com.zm.blog.BlogApplication - Started BlogApplication in 3.652 seconds (process running for 4.471)
+2025-09-28 15:51:14 [main] INFO  com.zm.blog.BlogApplication - Starting BlogApplication v0.0.1-SNAPSHOT using Java 17.0.12 with PID 30546 (/home/yfc/project_dpap/dpap-workspace/project_aaa_api/target/blog-0.0.1-SNAPSHOT.jar started by yfc in /home/yfc/project_dpap/dpap-workspace/project_aaa_api)
+2025-09-28 15:51:14 [main] INFO  com.zm.blog.BlogApplication - The following 1 profile is active: "test"
+2025-09-28 15:51:17 [main] INFO  com.zm.blog.BlogApplication - Started BlogApplication in 3.658 seconds (process running for 4.419)
