@@ -3,6 +3,29 @@ spring:
         name: blog-article-service
     profiles:
         active: dev
+    datasource:
+        url: ${DB_URL:jdbc:mysql://localhost:3306/blog_db?useSSL=false&serverTimezone=UTC}
+        username: ${DB_USERNAME:root}
+        password: ${DB_PASSWORD:password}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: false
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.MySQL8Dialect
+                format_sql: true
+    mvc:
+        pathmatch:
+            matching-strategy: ant_path_matcher
+    messages:
+        basename: messages
+        encoding: UTF-8
+    servlet:
+        multipart:
+            max-file-size: 10MB
+            max-request-size: 10MB
 
 # --- Application Metadata ---
 app:
@@ -24,22 +47,6 @@ logging:
     pattern:
         console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
-# --- Database Configuration (Placeholder) ---
-spring:
-    datasource:
-        url: ${DB_URL:jdbc:mysql://localhost:3306/blog_db?useSSL=false&serverTimezone=UTC}
-        username: ${DB_USERNAME:root}
-        password: ${DB_PASSWORD:password}
-        driver-class-name: com.mysql.cj.jdbc.Driver
-    jpa:
-        hibernate:
-            ddl-auto: update
-        show-sql: false
-        properties:
-            hibernate:
-                dialect: org.hibernate.dialect.MySQL8Dialect
-                format_sql: true
-
 # --- MyBatis-Plus Configuration ---
 mybatis-plus:
     configuration:
@@ -57,12 +64,6 @@ jwt:
     secret: ${JWT_SECRET:your-secret-key-here}
     expiration: ${JWT_EXPIRATION:86400}
 
-# --- Validation Configuration ---
-spring:
-    mvc:
-        pathmatch:
-            matching-strategy: ant_path_matcher
-
 # --- Actuator Configuration ---
 management:
     endpoints:
@@ -72,16 +73,3 @@ management:
     endpoint:
         health:
             show-details: when-authorized
-
-# --- Internationalization ---
-spring:
-    messages:
-        basename: messages
-        encoding: UTF-8
-
-# --- File Upload Configuration ---
-spring:
-    servlet:
-        multipart:
-            max-file-size: 10MB
-            max-request-size: 10MB

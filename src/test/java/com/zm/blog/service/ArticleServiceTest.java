@@ -64,8 +64,17 @@ class ArticleServiceTest {
     @Test
     void createArticle_Success() {
         // Arrange
+        Article createdArticle = new Article();
+        createdArticle.setId(1L);
+        createdArticle.setTitle("测试标题");
+        createdArticle.setContent("测试内容");
+        createdArticle.setAuthorId(1L);
+        createdArticle.setStatus("draft");
+        createdArticle.setCreatedAt(LocalDateTime.now());
+        createdArticle.setUpdatedAt(LocalDateTime.now());
+
         when(articleMapper.insert(any(Article.class))).thenReturn(1);
-        when(articleMapper.selectById(any())).thenReturn(existingArticle);
+        when(articleMapper.selectById(any())).thenReturn(createdArticle);
 
         // Act
         ArticleResponse response = articleService.createArticle(createRequest, 1L);
@@ -75,6 +84,7 @@ class ArticleServiceTest {
         assertEquals("测试标题", response.getTitle());
         assertEquals("测试内容", response.getContent());
         verify(articleMapper, times(1)).insert(any(Article.class));
+        verify(articleMapper, times(1)).selectById(any());
     }
 
     @Test
@@ -93,8 +103,19 @@ class ArticleServiceTest {
         // Arrange
         createRequest.setTitle("<script>alert('xss')</script>标题");
         createRequest.setContent("内容<script>alert('xss')</script>");
+
+        // 创建一个过滤后的文章对象用于返回
+        Article filteredArticle = new Article();
+        filteredArticle.setId(1L);
+        filteredArticle.setTitle("标题"); // XSS应该被过滤
+        filteredArticle.setContent("内容"); // XSS应该被过滤
+        filteredArticle.setAuthorId(1L);
+        filteredArticle.setStatus("draft");
+        filteredArticle.setCreatedAt(LocalDateTime.now());
+        filteredArticle.setUpdatedAt(LocalDateTime.now());
+
         when(articleMapper.insert(any(Article.class))).thenReturn(1);
-        when(articleMapper.selectById(any())).thenReturn(existingArticle);
+        when(articleMapper.selectById(any())).thenReturn(filteredArticle);
 
         // Act
         ArticleResponse response = articleService.createArticle(createRequest, 1L);
@@ -103,14 +124,27 @@ class ArticleServiceTest {
         assertNotNull(response);
         assertFalse(response.getTitle().contains("<script>"), "XSS脚本应该被过滤");
         assertFalse(response.getContent().contains("<script>"), "XSS脚本应该被过滤");
+        verify(articleMapper, times(1)).insert(any(Article.class));
+        verify(articleMapper, times(1)).selectById(any());
     }
 
     @Test
     void createArticle_WithSQL_Injection() {
         // Arrange
         createRequest.setTitle("标题'; DROP TABLE users; --");
+
+        // 创建一个过滤后的文章对象用于返回
+        Article filteredArticle = new Article();
+        filteredArticle.setId(1L);
+        filteredArticle.setTitle("标题"); // SQL注入应该被过滤
+        filteredArticle.setContent("测试内容");
+        filteredArticle.setAuthorId(1L);
+        filteredArticle.setStatus("draft");
+        filteredArticle.setCreatedAt(LocalDateTime.now());
+        filteredArticle.setUpdatedAt(LocalDateTime.now());
+
         when(articleMapper.insert(any(Article.class))).thenReturn(1);
-        when(articleMapper.selectById(any())).thenReturn(existingArticle);
+        when(articleMapper.selectById(any())).thenReturn(filteredArticle);
 
         // Act
         ArticleResponse response = articleService.createArticle(createRequest, 1L);
@@ -118,13 +152,19 @@ class ArticleServiceTest {
         // Assert
         assertNotNull(response);
         assertFalse(response.getTitle().contains("DROP TABLE"), "SQL注入应该被过滤");
+        verify(articleMapper, times(1)).insert(any(Article.class));
+        verify(articleMapper, times(1)).selectById(any());
     }
 
     @Test
     void editArticle_Success() {
         // Arrange
+        LocalDateTime updateTime = LocalDateTime.now();
+        existingArticle.setUpdatedAt(updateTime);
+        editRequest.setUpdatedAt(updateTime); // 匹配的时间戳
         when(articleMapper.selectById(1L)).thenReturn(existingArticle);
         when(articleMapper.updateById(any(Article.class))).thenReturn(1);
+        when(articleMapper.selectWithAuthor(1L)).thenReturn(existingArticle);
 
         // Act
         ArticleResponse response = articleService.editArticle(1L, editRequest, 1L);
@@ -133,6 +173,7 @@ class ArticleServiceTest {
         assertNotNull(response);
         verify(articleMapper, times(1)).selectById(1L);
         verify(articleMapper, times(1)).updateById(any(Article.class));
+        verify(articleMapper, times(1)).selectWithAuthor(1L);
     }
 
     @Test
@@ -163,7 +204,9 @@ class ArticleServiceTest {
     @Test
     void editArticle_ConcurrentConflict() {
         // Arrange
-        existingArticle.setUpdatedAt(LocalDateTime.now().minusMinutes(1)); // 旧版本
+        LocalDateTime oldUpdateTime = LocalDateTime.now().minusMinutes(1);
+        existingArticle.setUpdatedAt(oldUpdateTime); // 旧版本
+        editRequest.setUpdatedAt(LocalDateTime.now()); // 新版本
         when(articleMapper.selectById(1L)).thenReturn(existingArticle);
 
         // Act & Assert

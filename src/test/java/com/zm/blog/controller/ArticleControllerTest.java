@@ -8,13 +8,11 @@ import com.zm.blog.service.ArticleService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -27,8 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * 文章控制器测试类
  */
-@WebMvcTest(ArticleController.class)
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 class ArticleControllerTest {
 
     @Autowired
@@ -70,7 +68,6 @@ class ArticleControllerTest {
     }
 
     @Test
-    @WithMockUser
     void createArticle_Success() throws Exception {
         // Arrange
         when(articleService.createArticle(any(ArticleCreateRequest.class), any(Long.class)))
@@ -89,7 +86,6 @@ class ArticleControllerTest {
     }
 
     @Test
-    @WithMockUser
     void createArticle_InvalidInput() throws Exception {
         // Arrange
         createRequest.setTitle(""); // 空标题
@@ -104,7 +100,6 @@ class ArticleControllerTest {
     }
 
     @Test
-    @WithMockUser
     void createArticle_TitleTooLong() throws Exception {
         // Arrange
         createRequest.setTitle("a".repeat(101)); // 101字符
@@ -119,7 +114,6 @@ class ArticleControllerTest {
     }
 
     @Test
-    @WithMockUser
     void editArticle_Success() throws Exception {
         // Arrange
         when(articleService.editArticle(eq(1L), any(ArticleEditRequest.class), any(Long.class)))
@@ -137,7 +131,6 @@ class ArticleControllerTest {
     }
 
     @Test
-    @WithMockUser
     void editArticle_NotFound() throws Exception {
         // Arrange
         when(articleService.editArticle(eq(1L), any(ArticleEditRequest.class), any(Long.class)))
@@ -153,7 +146,6 @@ class ArticleControllerTest {
     }
 
     @Test
-    @WithMockUser
     void editArticle_NoPermission() throws Exception {
         // Arrange
         when(articleService.editArticle(eq(1L), any(ArticleEditRequest.class), any(Long.class)))
@@ -169,7 +161,6 @@ class ArticleControllerTest {
     }
 
     @Test
-    @WithMockUser
     void editArticle_ConcurrentConflict() throws Exception {
         // Arrange
         when(articleService.editArticle(eq(1L), any(ArticleEditRequest.class), any(Long.class)))

@@ -59,6 +59,12 @@ public class Article {
     private Long authorId;
 
     /**
+     * 作者用户名（仅用于查询，不存储）
+     */
+    @TableField("author_username")
+    private String authorUsername;
+
+    /**
      * 创建时间
      */
     @TableField(value = "created_at", fill = FieldFill.INSERT)

@@ -56,8 +56,11 @@ public class ArticleService {
                 throw new BusinessException("创建文章失败");
             }
 
-            log.info("创建文章成功，ID: {}, 作者ID: {}", article.getId(), authorId);
-            return convertToResponse(article);
+            // 重新查询获取完整的文章信息（包括ID和时间戳）
+            Article createdArticle = articleMapper.selectById(article.getId());
+
+            log.info("创建文章成功，ID: {}, 作者ID: {}", createdArticle.getId(), authorId);
+            return convertToResponse(createdArticle);
 
         } catch (Exception e) {
             log.error("创建文章失败", e);
