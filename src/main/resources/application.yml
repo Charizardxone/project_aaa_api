@@ -1,5 +1,115 @@
+# ===================================================================
+# 博客系统核心文章管理模块 - 主配置文件
+# ===================================================================
+
+# --- 应用基础配置 ---
 spring:
-    application:
-        name: blog
-server:
-    port: 8080
+  application:
+    name: blog-article-service
+  profiles:
+    active: dev  # 默认激活开发环境，可通过启动参数覆盖
+
+  # --- 数据库配置占位符 ---
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:blog_db}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
+
+  # --- JPA 配置占位符 (可选) ---
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  # --- 国际化配置 ---
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+
+  # --- 文件上传配置 ---
+  servlet:
+    multipart:
+      max-file-size: ${MAX_FILE_SIZE:10MB}
+      max-request-size: ${MAX_REQUEST_SIZE:100MB}
+
+  # --- 缓存配置 ---
+  cache:
+    type: simple
+    cache-names: articles, users, categories
+
+# --- MyBatis-Plus 配置占位符 ---
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  mapper-locations: classpath:mapper/*.xml
+
+# --- 日志配置 ---
+logging:
+  level:
+    root: INFO
+    com.zm.blog: DEBUG
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# --- 应用自定义配置 ---
+app:
+  version: 0.1.0
+  name: Blog Article Service
+  description: 博客系统核心文章管理模块
+
+  # --- JWT 配置占位符 ---
+  jwt:
+    secret: ${JWT_SECRET:your-jwt-secret-key}
+    expiration: ${JWT_EXPIRATION:86400}  # 24小时，单位秒
+    refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800}  # 7天，单位秒
+    header: Authorization
+    prefix: Bearer
+
+# --- Swagger/OpenAPI 配置 ---
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+  info:
+    title: Blog Article Service API
+    description: 博客系统核心文章管理模块 API 文档
+    version: ${app.version}
+
+# --- 跨域配置 ---
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
+  allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,OPTIONS}
+  allowed-headers: ${CORS_ALLOWED_HEADERS:*}
+  allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}
+  max-age: ${CORS_MAX_AGE:3600}
+
+# --- 管理端点配置 ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    git:
+      mode: full

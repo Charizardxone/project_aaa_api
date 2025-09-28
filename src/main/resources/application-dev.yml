@@ -1,0 +1,108 @@
+# ===================================================================
+# 博客系统核心文章管理模块 - 开发环境配置
+# ===================================================================
+
+# --- Spring Boot 开发环境配置 ---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  # --- 数据库配置（开发环境使用H2内存数据库，便于开发测试） ---
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:blog_dev_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: password
+
+  # --- H2 控制台配置（开发环境启用） ---
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+  # --- JPA 开发环境配置 ---
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # 开发环境自动创建和删除表
+    show-sql: true  # 开发环境显示SQL语句
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+  # --- 开发环境日志配置 ---
+logging:
+  level:
+    root: INFO
+    com.zm.blog: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+  # --- 文件上传配置 ---
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
+
+  # --- 缓存配置 ---
+  cache:
+    type: simple
+    cache-names: articles, users, categories
+
+  # --- 开发环境调试配置 ---
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+      exclude: static/**,templates/**
+  thymeleaf:
+    cache: false
+
+# --- 服务器配置 ---
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+# --- 开发环境跨域配置（允许本地开发） ---
+cors:
+  allowed-origins: http://localhost:3000,http://localhost:8080,http://127.0.0.1:3000
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: "*"
+  allow-credentials: true
+  max-age: 3600
+
+# --- 开发环境Swagger配置（启用详细文档） ---
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+  show-actuator: true
+
+# --- 开发环境JWT配置（使用测试密钥） ---
+app:
+  jwt:
+    secret: dev-jwt-secret-key-change-in-production
+    expiration: 86400
+    refresh-expiration: 604800
+
+# --- 开发环境管理端点配置（暴露所有端点） ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+# --- 开发环境调试配置 ---
+debug: true

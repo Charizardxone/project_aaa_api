@@ -1,0 +1,155 @@
+# ===================================================================
+# 博客系统核心文章管理模块 - 生产环境配置
+# ===================================================================
+
+# --- Spring Boot 生产环境配置 ---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  # --- 数据库配置（生产环境使用MySQL，通过环境变量配置） ---
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:blog_db}?useUnicode=true&characterEncoding=utf8&useSSL=true&serverTimezone=Asia/Shanghai
+    username: ${DB_USERNAME:}
+    password: ${DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      pool-name: BlogHikariCP
+
+  # --- JPA 生产环境配置 ---
+  jpa:
+    hibernate:
+      ddl-auto: validate  # 生产环境使用validate，通过Flyway管理数据库变更
+    show-sql: false  # 生产环境不显示SQL语句
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
+        jdbc.batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+  # --- 生产环境日志配置 ---
+logging:
+  level:
+    root: WARN
+    com.zm.blog: WARN
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.hibernate: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${LOG_FILE:/var/log/blog/article-service.log}
+    max-size: 100MB
+    max-history: 30
+
+  # --- 文件上传配置 ---
+  servlet:
+    multipart:
+      max-file-size: ${MAX_FILE_SIZE:10MB}
+      max-request-size: ${MAX_REQUEST_SIZE:50MB}
+
+  # --- 缓存配置 ---
+  cache:
+    type: redis  # 生产环境使用Redis
+    redis:
+      time-to-live: 3600000  # 1小时
+      cache-null-values: false
+
+  # --- Redis配置 ---
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: ${REDIS_DATABASE:0}
+    timeout: 2000
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1
+
+  # --- 性能配置 ---
+  main:
+    lazy-initialization: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: Asia/Shanghai
+
+# --- 服务器配置 ---
+server:
+  port: 8082
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,application/json,application/javascript
+    min-response-size: 2048
+
+  # --- SSL配置 ---
+  ssl:
+    enabled: ${SSL_ENABLED:false}
+    key-store: ${SSL_KEY_STORE:classpath:keystore.p12}
+    key-store-password: ${SSL_KEY_STORE_PASSWORD:}
+    key-store-type: ${SSL_KEY_STORE_TYPE:PKCS12}
+    key-alias: ${SSL_KEY_ALIAS:tomcat}
+
+# --- 生产环境跨域配置（严格限制允许的源） ---
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:https://your-domain.com}
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: "${CORS_ALLOWED_HEADERS:Authorization,Content-Type,Accept}"
+  allow-credentials: false
+  max-age: 3600
+
+# --- 生产环境Swagger配置（生产环境关闭） ---
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:false}
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:false}
+  show-actuator: false
+
+# --- 生产环境JWT配置（通过环境变量配置） ---
+app:
+  jwt:
+    secret: ${JWT_SECRET:}
+    expiration: ${JWT_EXPIRATION:86400}  # 24小时，单位秒
+    refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800}  # 7天，单位秒
+
+# --- 生产环境管理端点配置（最小暴露） ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+  metrics:
+    export:
+      prometheus:
+        enabled: ${PROMETHEUS_ENABLED:false}
+
+  # --- 监控配置 ---
+  health:
+    db:
+      enabled: true
+    redis:
+      enabled: true
+  metrics:
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true
