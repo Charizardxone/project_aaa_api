@@ -1,5 +1,159 @@
+# ===================================================================
+#                      Blog System Configuration
+# ===================================================================
+# Main configuration file for blog article service
+# Supports multi-environment configuration with profiles
+
+# --- Application Basic Information ---
 spring:
-    application:
-        name: blog
+  application:
+    name: blog-article-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  # --- Database Configuration Placeholder ---
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/blog_db?useSSL=false&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:20}
+      minimum-idle: ${DB_POOL_MIN:5}
+      connection-timeout: ${DB_TIMEOUT:30000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
+
+  # --- JPA Configuration (Optional) ---
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:update}
+    show-sql: ${JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        dialect: ${JPA_DIALECT:org.hibernate.dialect.MySQL8Dialect}
+        format_sql: ${JPA_FORMAT_SQL:false}
+
+  # --- File Upload Configuration ---
+  servlet:
+    multipart:
+      enabled: ${FILE_UPLOAD_ENABLED:true}
+      max-file-size: ${FILE_MAX_SIZE:10MB}
+      max-request-size: ${FILE_MAX_REQUEST_SIZE:10MB}
+      file-size-threshold: ${FILE_SIZE_THRESHOLD:0}
+
+  # --- Internationalization (i18n) ---
+  messages:
+    basename: ${I18N_BASENAME:messages}
+    encoding: ${I18N_ENCODING:UTF-8}
+    fallback-to-system-locale: ${I18N_FALLBACK:false}
+
+  # --- Redis Configuration (Optional) ---
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+      timeout: ${REDIS_TIMEOUT:3000}
+      lettuce:
+        pool:
+          max-active: ${REDIS_POOL_MAX:20}
+          max-idle: ${REDIS_POOL_IDLE:10}
+          min-idle: ${REDIS_POOL_MIN:1}
+          max-wait: ${REDIS_POOL_WAIT:3000}
+
+  # --- Validation Configuration ---
+  mvc:
+    throw-exception-if-no-handler-found: ${VALIDATION_THROW_EXCEPTION:true}
+    dispatch-options-request: ${VALIDATION_DISPATCH_OPTIONS:false}
+
+# --- Server Configuration ---
 server:
-    port: 8080
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: ${CONTEXT_PATH:/}
+  compression:
+    enabled: ${COMPRESSION_ENABLED:true}
+    mime-types: ${COMPRESSION_MIME_TYPES:text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json}
+    min-response-size: ${COMPRESSION_MIN_SIZE:2048}
+
+# --- MyBatis-Plus Configuration ---
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: ${MYBATIS_CAMEL_CASE:true}
+    cache-enabled: ${MYBATIS_CACHE:false}
+    log-impl: ${MYBATIS_LOG_IMPL:org.apache.ibatis.logging.stdout.StdOutImpl}
+  global-config:
+    db-config:
+      id-type: ${MYBATIS_ID_TYPE:assign_id}
+      logic-delete-field: ${MYBATIS_LOGIC_DELETE_FIELD:deleted}
+      logic-delete-value: ${MYBATIS_LOGIC_DELETE_VALUE:1}
+      logic-not-delete-value: ${MYBATIS_LOGIC_NOT_DELETE_VALUE:0}
+  mapper-locations: ${MYBATIS_MAPPER_LOCATIONS:classpath*:/mapper/**/*.xml}
+
+# --- Logging Configuration ---
+logging:
+  level:
+    root: ${LOG_LEVEL_ROOT:INFO}
+    com.zm.blog: ${LOG_LEVEL_APP:DEBUG}
+    org.springframework.web: ${LOG_LEVEL_WEB:INFO}
+    org.hibernate.SQL: ${LOG_LEVEL_SQL:DEBUG}
+  pattern:
+    console: "${LOG_PATTERN:%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n}"
+    file: "${LOG_FILE_PATTERN:%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n}"
+  file:
+    name: ${LOG_FILE_PATH:logs/blog-article-service.log}
+    max-size: ${LOG_MAX_SIZE:10MB}
+    max-history: ${LOG_MAX_HISTORY:30}
+
+# --- Application Custom Configuration ---
+app:
+  version: ${APP_VERSION:0.1.0}
+  name: ${APP_NAME:Blog Article Service}
+  description: ${APP_DESCRIPTION:Blog Article Management System}
+  debug: ${APP_DEBUG:false}
+
+  # --- Cross-Origin Resource Sharing (CORS) ---
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:8080}
+    allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,OPTIONS}
+    allowed-headers: ${CORS_ALLOWED_HEADERS:*}
+    allow-credentials: ${CORS_CREDENTIALS:true}
+    max-age: ${CORS_MAX_AGE:3600}
+
+# --- JWT Configuration Placeholder ---
+jwt:
+  secret: ${JWT_SECRET:your-secret-key-placeholder}
+  expiration: ${JWT_EXPIRATION:86400000}  # 24 hours in milliseconds
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}  # 7 days in milliseconds
+  header: ${JWT_HEADER:Authorization}
+  prefix: ${JWT_PREFIX:Bearer }
+
+# --- Swagger/OpenAPI Configuration ---
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:true}
+    path: ${SWAGGER_API_DOCS_PATH:/api-docs}
+  swagger-ui:
+    enabled: ${SWAGGER_UI_ENABLED:true}
+    path: ${SWAGGER_UI_PATH:/swagger-ui.html}
+    try-it-out-enabled: ${SWAGGER_TRY_IT_OUT:true}
+    operations-sorter: ${SWAGGER_OPERATIONS_SORTER:method}
+    tags-sorter: ${SWAGGER_TAGS_SORTER:alpha}
+  show-actuator: ${SWAGGER_SHOW_ACTUATOR:false}
+
+# --- Management/Actuator Configuration ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${MANAGEMENT_ENDPOINTS:health,info,metrics}
+  endpoint:
+    health:
+      show-details: ${MANAGEMENT_HEALTH_DETAILS:when-authorized}
+  metrics:
+    export:
+      simple:
+        enabled: ${MANAGEMENT_METRICS:true}
+

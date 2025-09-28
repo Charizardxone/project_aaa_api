@@ -1,0 +1,16 @@
+2025-09-28 17:13:56 [main] INFO  com.zm.blog.BlogApplication - Starting BlogApplication using Java 17.0.12 with PID 36289 (/home/yfc/project_dpap/dpap-workspace/project_aaa_api/target/classes started by yfc in /home/yfc/project_dpap/dpap-workspace/project_aaa_api)
+2025-09-28 17:13:56 [main] DEBUG com.zm.blog.BlogApplication - Running with Spring Boot v3.5.5, Spring v6.2.10
+2025-09-28 17:13:56 [main] INFO  com.zm.blog.BlogApplication - The following 1 profile is active: "dev"
+2025-09-28 17:13:57 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-09-28 17:13:57 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-09-28 17:13:57 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.44]
+2025-09-28 17:13:58 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-09-28 17:13:58 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1473 ms
+2025-09-28 17:13:58 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2025-09-28 17:13:58 [main] INFO  com.zm.blog.BlogApplication - Started BlogApplication in 2.945 seconds (process running for 3.421)
+2025-09-28 17:14:05 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-28 17:14:05 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-09-28 17:15:02 [main] INFO  com.zm.blog.BlogApplicationTests - Starting BlogApplicationTests using Java 17.0.12 with PID 36607 (started by yfc in /home/yfc/project_dpap/dpap-workspace/project_aaa_api)
+2025-09-28 17:15:02 [main] DEBUG com.zm.blog.BlogApplicationTests - Running with Spring Boot v3.5.5, Spring v6.2.10
+2025-09-28 17:15:02 [main] INFO  com.zm.blog.BlogApplicationTests - The following 1 profile is active: "dev"
+2025-09-28 17:15:04 [main] INFO  com.zm.blog.BlogApplicationTests - Started BlogApplicationTests in 2.952 seconds (process running for 4.414)

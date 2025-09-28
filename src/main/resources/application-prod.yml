@@ -1,0 +1,213 @@
+# ===================================================================
+#                Production Environment Configuration
+# ===================================================================
+# Production profile configuration for production environment
+# Activated by: --spring.profiles.active=prod
+# Security Note: All sensitive data should be injected via environment variables
+
+# --- Production Server Configuration ---
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: ${CONTEXT_PATH:/}
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 2048
+
+# --- Production Database Configuration ---
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://prod-db-host:3306/blog_prod?useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:50}
+      minimum-idle: ${DB_POOL_MIN:10}
+      connection-timeout: ${DB_TIMEOUT:30000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
+      leak-detection-threshold: ${DB_LEAK_DETECTION:60000}
+
+  # --- Production JPA Configuration ---
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: ${JPA_DIALECT:org.hibernate.dialect.MySQL8Dialect}
+        format_sql: false
+        generate_statistics: false
+        jdbc:
+          batch_size: 20
+          order_inserts: true
+          order_updates: true
+
+  # --- Production File Upload Configuration ---
+  servlet:
+    multipart:
+      enabled: ${FILE_UPLOAD_ENABLED:true}
+      max-file-size: ${FILE_MAX_SIZE:5MB}
+      max-request-size: ${FILE_MAX_REQUEST_SIZE:5MB}
+      file-size-threshold: ${FILE_SIZE_THRESHOLD:0}
+
+  # --- Production Redis Configuration ---
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+      database: ${REDIS_DATABASE:0}
+      timeout: ${REDIS_TIMEOUT:3000}
+      lettuce:
+        pool:
+          max-active: ${REDIS_POOL_MAX:100}
+          max-idle: ${REDIS_POOL_IDLE:50}
+          min-idle: ${REDIS_POOL_MIN:10}
+          max-wait: ${REDIS_POOL_WAIT:3000}
+
+  # --- Production Validation Configuration ---
+  mvc:
+    throw-exception-if-no-handler-found: true
+    dispatch-options-request: false
+
+  # --- Production Internationalization (i18n) ---
+  messages:
+    basename: ${I18N_BASENAME:messages}
+    encoding: ${I18N_ENCODING:UTF-8}
+    fallback-to-system-locale: ${I18N_FALLBACK:false}
+
+  # --- Production Security Configuration ---
+  security:
+    user:
+      name: ${ADMIN_USER}
+      password: ${ADMIN_PASSWORD}
+
+  # --- Production Performance Configuration ---
+  main:
+    allow-bean-definition-overriding: false
+    lazy-initialization: ${LAZY_INITIALIZATION:false}
+  task:
+    execution:
+      pool:
+        core-size: ${TASK_POOL_CORE:2}
+        max-size: ${TASK_POOL_MAX:10}
+        queue-capacity: ${TASK_QUEUE_CAPACITY:100}
+      thread-name-prefix: blog-task-
+
+  # --- Production Monitoring Configuration ---
+  tracing:
+    sampling:
+      probability: ${TRACING_SAMPLING:0.1}
+
+# --- Production MyBatis-Plus Configuration ---
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    default-statement-timeout: 30
+  global-config:
+    db-config:
+      id-type: assign_id
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      table-prefix: ""
+  mapper-locations: classpath*:/mapper/**/*.xml
+
+# --- Production Logging Configuration ---
+logging:
+  level:
+    root: WARN
+    com.zm.blog: INFO
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN
+    org.springframework.security: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${LOG_FILE_PATH:logs/blog-article-service-prod.log}
+    max-size: ${LOG_MAX_SIZE:100MB}
+    max-history: ${LOG_MAX_HISTORY:90}
+  logback:
+    rollingpolicy:
+      max-file-size: ${LOG_MAX_SIZE:100MB}
+      max-history: ${LOG_MAX_HISTORY:90}
+      total-size-cap: ${LOG_TOTAL_SIZE_CAP:1GB}
+
+# --- Production Application Configuration ---
+app:
+  version: ${APP_VERSION:0.1.0}
+  name: Blog Article Service (Production)
+  description: Blog Article Management System - Production Environment
+  debug: false
+
+  # --- Production CORS Configuration ---
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:https://your-domain.com}
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: ${CORS_ALLOWED_HEADERS:Content-Type,Authorization}
+    allow-credentials: ${CORS_CREDENTIALS:true}
+    max-age: ${CORS_MAX_AGE:3600}
+
+# --- Production JWT Configuration ---
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:86400000}  # 24 hours in milliseconds
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}  # 7 days in milliseconds
+  header: ${JWT_HEADER:Authorization}
+  prefix: ${JWT_PREFIX:Bearer}
+
+# --- Production Swagger/OpenAPI Configuration ---
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:false}
+    path: ${SWAGGER_API_DOCS_PATH:/api-docs}
+  swagger-ui:
+    enabled: ${SWAGGER_UI_ENABLED:false}
+    path: ${SWAGGER_UI_PATH:/swagger-ui.html}
+    try-it-out-enabled: false
+    operations-sorter: method
+    tags-sorter: alpha
+  show-actuator: false
+
+# --- Production Management/Actuator Configuration ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${MANAGEMENT_ENDPOINTS:health,info}
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: ${MANAGEMENT_HEALTH_DETAILS:never}
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: db,redis
+        readiness:
+          include: db,redis
+  metrics:
+    export:
+      simple:
+        enabled: ${MANAGEMENT_METRICS:true}
+    tags:
+      application: ${spring.application.name}
+      environment: prod
+
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+    export:
+      prometheus:
+        enabled: ${PROMETHEUS_ENABLED:true}
