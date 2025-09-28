@@ -1,6 +1,7 @@
 package com.zm.blog.service;
 
 import com.zm.blog.dto.ArticleCreateRequest;
+import com.zm.blog.dto.ArticleEditRequest;
 import com.zm.blog.dto.ArticleResponse;
 import com.zm.blog.entity.Article;
 import com.zm.blog.mapper.ArticleMapper;
@@ -27,6 +28,7 @@ class ArticleServiceTest {
     private ArticleService articleService;
 
     private ArticleCreateRequest validRequest;
+    private ArticleEditRequest editRequest;
     private Article savedArticle;
 
     @BeforeEach
@@ -38,6 +40,15 @@ class ArticleServiceTest {
             "test, tags"
         );
 
+        LocalDateTime now = LocalDateTime.now();
+        editRequest = new ArticleEditRequest(
+            "New Title",
+            "New Content",
+            "New Summary",
+            "new, test",
+            now
+        );
+
         savedArticle = new Article();
         savedArticle.setId(1L);
         savedArticle.setTitle("Test Title");
@@ -46,8 +57,8 @@ class ArticleServiceTest {
         savedArticle.setTags("test, tags");
         savedArticle.setStatus("draft");
         savedArticle.setAuthorId(1L);
-        savedArticle.setCreatedAt(LocalDateTime.now());
-        savedArticle.setUpdatedAt(LocalDateTime.now());
+        savedArticle.setCreatedAt(now);
+        savedArticle.setUpdatedAt(now);
     }
 
     @Test
@@ -148,5 +159,64 @@ class ArticleServiceTest {
 
         assertFalse(isOwner);
         verify(articleMapper, times(1)).selectById(1L);
+    }
+
+    @Test
+    void editArticle_Success() {
+        when(articleMapper.selectById(1L)).thenReturn(savedArticle);
+        when(articleMapper.update(any(), any())).thenReturn(1);
+        when(articleMapper.selectById(1L)).thenReturn(savedArticle);
+
+        ArticleResponse response = articleService.editArticle(editRequest, 1L, 1L);
+
+        assertNotNull(response);
+        assertEquals(1L, response.getId());
+        verify(articleMapper, times(1)).update(any(), any());
+    }
+
+    @Test
+    void editArticle_NotFound() {
+        when(articleMapper.selectById(999L)).thenReturn(null);
+
+        assertThrows(RuntimeException.class, () -> {
+            articleService.editArticle(editRequest, 999L, 1L);
+        });
+    }
+
+    @Test
+    void editArticle_UnauthorizedUser() {
+        when(articleMapper.selectById(1L)).thenReturn(savedArticle);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            articleService.editArticle(editRequest, 1L, 2L);
+        });
+    }
+
+    @Test
+    void editArticle_ConcurrentModification() {
+        LocalDateTime differentTime = savedArticle.getUpdatedAt().plusMinutes(1);
+        ArticleEditRequest staleRequest = new ArticleEditRequest(
+            "New Title",
+            "New Content",
+            "New Summary",
+            "new, test",
+            differentTime
+        );
+
+        when(articleMapper.selectById(1L)).thenReturn(savedArticle);
+
+        assertThrows(IllegalStateException.class, () -> {
+            articleService.editArticle(staleRequest, 1L, 1L);
+        });
+    }
+
+    @Test
+    void editArticle_UpdateFailure() {
+        when(articleMapper.selectById(1L)).thenReturn(savedArticle);
+        when(articleMapper.update(any(), any())).thenReturn(0);
+
+        assertThrows(IllegalStateException.class, () -> {
+            articleService.editArticle(editRequest, 1L, 1L);
+        });
     }
 }

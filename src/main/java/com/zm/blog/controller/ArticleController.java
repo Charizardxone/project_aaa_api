@@ -1,6 +1,7 @@
 package com.zm.blog.controller;
 
 import com.zm.blog.dto.ArticleCreateRequest;
+import com.zm.blog.dto.ArticleEditRequest;
 import com.zm.blog.dto.ArticleResponse;
 import com.zm.blog.dto.CommonResponse;
 import com.zm.blog.service.ArticleService;
@@ -68,6 +69,41 @@ public class ArticleController {
             return ResponseEntity.ok(CommonResponse.success(response));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CommonResponse<ArticleResponse>> editArticle(
+            @PathVariable Long id,
+            @Valid @RequestBody ArticleEditRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        try {
+            // Get user ID from authenticated user
+            Long authorId = getUserIdFromUserDetails(userDetails);
+            log.info("User {} attempting to edit article {}", authorId, id);
+
+            // Edit article
+            ArticleResponse response = articleService.editArticle(request, id, authorId);
+            log.info("Article {} edited successfully by user {}", id, authorId);
+
+            return ResponseEntity.ok(CommonResponse.success(response));
+
+        } catch (IllegalArgumentException e) {
+            log.error("Validation error while editing article: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(CommonResponse.error(400, e.getMessage()));
+        } catch (IllegalStateException e) {
+            log.error("Concurrent modification error while editing article: {}", e.getMessage());
+            return ResponseEntity.status(409)
+                    .body(CommonResponse.error(409, e.getMessage()));
+        } catch (RuntimeException e) {
+            log.error("Error editing article: {}", e.getMessage(), e);
+            if (e.getMessage().contains("Article not found")) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.internalServerError()
+                    .body(CommonResponse.error(500, "Internal server error"));
         }
     }
 

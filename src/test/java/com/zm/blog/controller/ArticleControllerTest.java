@@ -2,6 +2,7 @@ package com.zm.blog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zm.blog.dto.ArticleCreateRequest;
+import com.zm.blog.dto.ArticleEditRequest;
 import com.zm.blog.dto.ArticleResponse;
 import com.zm.blog.dto.CommonResponse;
 import com.zm.blog.service.ArticleService;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,6 +41,7 @@ class ArticleControllerTest {
     private ObjectMapper objectMapper;
     private UserDetails userDetails;
     private ArticleCreateRequest validRequest;
+    private ArticleEditRequest editRequest;
     private ArticleResponse articleResponse;
 
     @BeforeEach
@@ -51,6 +54,15 @@ class ArticleControllerTest {
             "Test Content",
             "Test Summary",
             "test, tags"
+        );
+
+        LocalDateTime now = LocalDateTime.now();
+        editRequest = new ArticleEditRequest(
+            "Edited Title",
+            "Edited Content",
+            "Edited Summary",
+            "edit, test",
+            now
         );
 
         articleResponse = new ArticleResponse();
@@ -186,5 +198,76 @@ class ArticleControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(0, response.getBody().getCode());
+    }
+
+    @Test
+    void editArticle_Success() {
+        when(articleService.editArticle(any(ArticleEditRequest.class), any(Long.class), any(Long.class)))
+            .thenReturn(articleResponse);
+
+        ResponseEntity<CommonResponse<ArticleResponse>> response =
+            articleController.editArticle(1L, editRequest, userDetails);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(0, response.getBody().getCode());
+        assertEquals("success", response.getBody().getMessage());
+        assertNotNull(response.getBody().getData());
+
+        verify(articleService, times(1)).editArticle(any(ArticleEditRequest.class), any(Long.class), any(Long.class));
+    }
+
+    @Test
+    void editArticle_ValidationException() {
+        when(articleService.editArticle(any(ArticleEditRequest.class), any(Long.class), any(Long.class)))
+            .thenThrow(new IllegalArgumentException("Invalid input"));
+
+        ResponseEntity<CommonResponse<ArticleResponse>> response =
+            articleController.editArticle(1L, editRequest, userDetails);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(400, response.getBody().getCode());
+        assertEquals("Invalid input", response.getBody().getMessage());
+    }
+
+    @Test
+    void editArticle_ConcurrentModification() {
+        when(articleService.editArticle(any(ArticleEditRequest.class), any(Long.class), any(Long.class)))
+            .thenThrow(new IllegalStateException("Concurrent modification detected"));
+
+        ResponseEntity<CommonResponse<ArticleResponse>> response =
+            articleController.editArticle(1L, editRequest, userDetails);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(409, response.getBody().getCode());
+        assertEquals("Concurrent modification detected", response.getBody().getMessage());
+    }
+
+    @Test
+    void editArticle_NotFound() {
+        when(articleService.editArticle(any(ArticleEditRequest.class), any(Long.class), any(Long.class)))
+            .thenThrow(new RuntimeException("Article not found"));
+
+        ResponseEntity<CommonResponse<ArticleResponse>> response =
+            articleController.editArticle(1L, editRequest, userDetails);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    void editArticle_RuntimeException() {
+        when(articleService.editArticle(any(ArticleEditRequest.class), any(Long.class), any(Long.class)))
+            .thenThrow(new RuntimeException("Database error"));
+
+        ResponseEntity<CommonResponse<ArticleResponse>> response =
+            articleController.editArticle(1L, editRequest, userDetails);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(500, response.getBody().getCode());
+        assertEquals("Internal server error", response.getBody().getMessage());
     }
 }
