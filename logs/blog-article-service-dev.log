@@ -1,0 +1,36 @@
+2025-09-29 10:54:37.544 [main] INFO  com.zm.blog.BlogApplication - Starting BlogApplication using Java 17.0.12 with PID 13838 (/home/yfc/project_dpap/dpap-workspace/project_aaa_api/target/classes started by yfc in /home/yfc/project_dpap/dpap-workspace/project_aaa_api)
+2025-09-29 10:54:37.548 [main] DEBUG com.zm.blog.BlogApplication - Running with Spring Boot v3.5.5, Spring v6.2.10
+2025-09-29 10:54:37.549 [main] INFO  com.zm.blog.BlogApplication - The following 1 profile is active: "dev"
+2025-09-29 10:54:39.206 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-09-29 10:54:39.248 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2025-09-29 10:54:39.249 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.44]
+2025-09-29 10:54:39.370 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/api/v1] - Initializing Spring embedded WebApplicationContext
+2025-09-29 10:54:39.372 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1723 ms
+2025-09-29 10:54:39.726 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 2 mappings in 'requestMappingHandlerMapping'
+2025-09-29 10:54:39.856 [main] DEBUG o.s.web.servlet.handler.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+2025-09-29 10:54:39.891 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-09-29 10:54:39.973 [main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-09-29 10:54:40.114 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/api/v1'
+2025-09-29 10:54:40.128 [main] INFO  com.zm.blog.BlogApplication - Started BlogApplication in 3.488 seconds (process running for 3.836)
+2025-09-29 10:54:47.142 [SpringApplicationShutdownHook] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-29 10:54:47.160 [tomcat-shutdown] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-09-29 10:55:17.627 [main] INFO  com.zm.blog.BlogApplicationTests - Starting BlogApplicationTests using Java 17.0.12 with PID 14142 (started by yfc in /home/yfc/project_dpap/dpap-workspace/project_aaa_api)
+2025-09-29 10:55:17.629 [main] DEBUG com.zm.blog.BlogApplicationTests - Running with Spring Boot v3.5.5, Spring v6.2.10
+2025-09-29 10:55:17.631 [main] INFO  com.zm.blog.BlogApplicationTests - The following 1 profile is active: "dev"
+2025-09-29 10:55:17.670 [main] DEBUG o.s.w.context.support.GenericWebApplicationContext - Refreshing org.springframework.web.context.support.GenericWebApplicationContext@2375b321
+2025-09-29 10:55:19.059 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 2 mappings in 'requestMappingHandlerMapping'
+2025-09-29 10:55:19.175 [main] DEBUG o.s.web.servlet.handler.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+2025-09-29 10:55:19.202 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-09-29 10:55:19.272 [main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-09-29 10:55:19.384 [main] INFO  com.zm.blog.BlogApplicationTests - Started BlogApplicationTests in 2.415 seconds (process running for 3.851)
+2025-09-29 10:55:20.430 [SpringApplicationShutdownHook] DEBUG o.s.w.context.support.GenericWebApplicationContext - Closing org.springframework.web.context.support.GenericWebApplicationContext@2375b321, started on Mon Sep 29 10:55:17 CST 2025
+2025-09-29 10:58:52.189 [main] INFO  com.zm.blog.BlogApplicationTests - Starting BlogApplicationTests using Java 17.0.12 with PID 14388 (started by yfc in /home/yfc/project_dpap/dpap-workspace/project_aaa_api)
+2025-09-29 10:58:52.190 [main] DEBUG com.zm.blog.BlogApplicationTests - Running with Spring Boot v3.5.5, Spring v6.2.10
+2025-09-29 10:58:52.192 [main] INFO  com.zm.blog.BlogApplicationTests - The following 1 profile is active: "dev"
+2025-09-29 10:58:52.233 [main] DEBUG o.s.w.context.support.GenericWebApplicationContext - Refreshing org.springframework.web.context.support.GenericWebApplicationContext@2375b321
+2025-09-29 10:58:53.691 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 2 mappings in 'requestMappingHandlerMapping'
+2025-09-29 10:58:53.826 [main] DEBUG o.s.web.servlet.handler.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+2025-09-29 10:58:53.861 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-09-29 10:58:53.934 [main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-09-29 10:58:54.050 [main] INFO  com.zm.blog.BlogApplicationTests - Started BlogApplicationTests in 2.641 seconds (process running for 4.043)
+2025-09-29 10:58:55.093 [SpringApplicationShutdownHook] DEBUG o.s.w.context.support.GenericWebApplicationContext - Closing org.springframework.web.context.support.GenericWebApplicationContext@2375b321, started on Mon Sep 29 10:58:52 CST 2025

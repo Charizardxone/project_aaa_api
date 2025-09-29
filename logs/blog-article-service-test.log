@@ -1,0 +1,11 @@
+2025-09-29 10:54:59.128 [main] INFO  com.zm.blog.BlogApplication - Starting BlogApplication using Java 17.0.12 with PID 13985 (/home/yfc/project_dpap/dpap-workspace/project_aaa_api/target/classes started by yfc in /home/yfc/project_dpap/dpap-workspace/project_aaa_api)
+2025-09-29 10:54:59.132 [main] INFO  com.zm.blog.BlogApplication - The following 1 profile is active: "test"
+2025-09-29 10:55:00.270 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2025-09-29 10:55:00.294 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2025-09-29 10:55:00.295 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.44]
+2025-09-29 10:55:00.366 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/api/v1] - Initializing Spring embedded WebApplicationContext
+2025-09-29 10:55:00.368 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1177 ms
+2025-09-29 10:55:00.851 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8081 (http) with context path '/api/v1'
+2025-09-29 10:55:00.862 [main] INFO  com.zm.blog.BlogApplication - Started BlogApplication in 2.505 seconds (process running for 2.886)
+2025-09-29 10:55:04.013 [SpringApplicationShutdownHook] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-29 10:55:04.020 [tomcat-shutdown] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Graceful shutdown complete
