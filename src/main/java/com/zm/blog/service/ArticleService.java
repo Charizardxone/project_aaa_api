@@ -1,6 +1,7 @@
 package com.zm.blog.service;
 
 import com.zm.blog.dto.ArticleCreateRequest;
+import com.zm.blog.dto.ArticleEditRequest;
 import com.zm.blog.dto.ArticleResponse;
 import com.zm.blog.entity.Article;
 import com.zm.blog.entity.User;
@@ -89,6 +90,51 @@ public class ArticleService {
 
     private String generateIdempotencyKey(ArticleCreateRequest request, Long authorId) {
         return String.valueOf((request.getTitle() + request.getContent() + authorId).hashCode());
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public ArticleResponse editArticle(Long articleId, ArticleEditRequest request, Long editorId) {
+        log.info("Editing article {} by user: {}", articleId, editorId);
+
+        // Find the article with author info
+        Article article = articleRepository.findArticleWithAuthor(articleId);
+        if (article == null) {
+            log.warn("Article not found with ID: {}", articleId);
+            throw new RuntimeException("文章不存在");
+        }
+
+        // Check if the editor is the author
+        if (!article.getAuthorId().equals(editorId)) {
+            log.warn("User {} attempted to edit article {} owned by {}", editorId, articleId, article.getAuthorId());
+            throw new RuntimeException("无权限编辑此文章");
+        }
+
+        // Optimistic locking check
+        if (!article.getUpdatedAt().equals(request.getUpdatedAt())) {
+            log.warn("Optimistic lock failure - article {} was modified by another user", articleId);
+            throw new RuntimeException("文章已被其他用户修改，请刷新后重试");
+        }
+
+        // Update article fields
+        article.setTitle(XssUtil.sanitizeText(request.getTitle()));
+        article.setContent(XssUtil.sanitizeContent(request.getContent()));
+        article.setSummary(XssUtil.sanitizeText(request.getSummary()));
+        article.setTags(XssUtil.sanitizeText(request.getTags()));
+        // updatedAt will be automatically updated by @UpdateTimestamp
+
+        // Save the updated article
+        Article savedArticle = articleRepository.save(article);
+
+        log.info("Article {} updated successfully", articleId);
+
+        // Build response
+        ArticleResponse response = new ArticleResponse();
+        BeanUtils.copyProperties(savedArticle, response);
+        if (savedArticle.getAuthor() != null) {
+            response.setAuthorName(savedArticle.getAuthor().getUsername());
+        }
+
+        return response;
     }
 
     // Clean up old idempotency cache entries periodically (in production, handle this differently)

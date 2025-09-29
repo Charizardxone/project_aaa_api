@@ -2,6 +2,7 @@ package com.zm.blog.controller;
 
 import com.zm.blog.dto.ApiResponse;
 import com.zm.blog.dto.ArticleCreateRequest;
+import com.zm.blog.dto.ArticleEditRequest;
 import com.zm.blog.dto.ArticleResponse;
 import com.zm.blog.service.ArticleService;
 import com.zm.blog.util.JwtUtil;
@@ -114,6 +115,84 @@ public class ArticleController {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             log.error("Unexpected error fetching article", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error(500, "服务器内部错误"));
+        }
+    }
+
+    /**
+     * Edit existing article
+     * PUT /api/articles/{id}
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ArticleResponse>> editArticle(
+            @PathVariable Long id,
+            @Valid @RequestBody ArticleEditRequest request,
+            BindingResult bindingResult,
+            HttpServletRequest httpRequest) {
+
+        log.info("Received article edit request for ID: {}", id);
+
+        // Validate request parameters
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getFieldErrors().stream()
+                    .findFirst()
+                    .map(error -> error.getDefaultMessage())
+                    .orElse("参数验证失败");
+
+            log.warn("Article edit validation failed: {}", errorMessage);
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(400, errorMessage));
+        }
+
+        try {
+            // Extract and validate JWT token
+            String token = extractToken(httpRequest);
+            if (StringUtils.isBlank(token)) {
+                log.warn("Missing authorization token");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(ApiResponse.error(401, "未认证"));
+            }
+
+            if (!jwtUtil.validateToken(token)) {
+                log.warn("Invalid or expired token");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(ApiResponse.error(401, "Token无效或已过期"));
+            }
+
+            // Get user ID from token
+            Long editorId = jwtUtil.getUserIdFromToken(token);
+            if (editorId == null) {
+                log.warn("Unable to extract user ID from token");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(ApiResponse.error(401, "无效的用户信息"));
+            }
+
+            // Edit article
+            ArticleResponse response = articleService.editArticle(id, request, editorId);
+
+            log.info("Article {} edited successfully", id);
+            return ResponseEntity.ok(ApiResponse.success("文章编辑成功", response));
+
+        } catch (RuntimeException e) {
+            log.error("Failed to edit article: {}", e.getMessage());
+
+            // Handle specific error types
+            if (e.getMessage().contains("文章不存在")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.error(404, e.getMessage()));
+            } else if (e.getMessage().contains("无权限")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(ApiResponse.error(403, e.getMessage()));
+            } else if (e.getMessage().contains("被其他用户修改")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(ApiResponse.error(409, e.getMessage()));
+            }
+
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(400, e.getMessage()));
+        } catch (Exception e) {
+            log.error("Unexpected error editing article", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.error(500, "服务器内部错误"));
         }
