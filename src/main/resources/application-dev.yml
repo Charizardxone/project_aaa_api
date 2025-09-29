@@ -1,0 +1,87 @@
+# ==================================================================================
+# 博客系统核心文章管理模块 - 开发环境配置
+# ==================================================================================
+# 环境：Development
+# 说明：开发环境专用配置，覆盖主配置文件的默认值
+# 特点：详细日志、调试开关开启、本地数据库、端口分离
+# ==================================================================================
+
+# --- 服务器配置 ---
+server:
+  port: 8080
+
+# --- Spring 框架配置 ---
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/blog_dev?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    hikari:
+      minimum-idle: 2
+      maximum-pool-size: 5
+      idle-timeout: 300000
+      pool-name: BlogArticleHikariCP-DEV
+
+  # --- JPA 配置 ---
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# --- MyBatis-Plus 开发配置 ---
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# --- 日志配置 ---
+logging:
+  level:
+    root: INFO
+    com.zm.blog: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  file:
+    name: logs/blog-article-service-dev.log
+
+# --- Swagger 配置 ---
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+# --- Actuator 配置 ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,configprops,beans,mappings
+  endpoint:
+    health:
+      show-details: always
+
+# --- 跨域配置 ---
+cors:
+  allowed-origins: http://localhost:3000,http://localhost:8081,http://127.0.0.1:3000
+
+# --- JWT 开发配置 ---
+jwt:
+  secret: dev_jwt_secret_key_for_development_only_not_for_production
+  expiration: 86400
+
+# --- 功能开关 ---
+feature:
+  article:
+    auto-save-interval: 10
+
+# --- 基础设施配置 ---
+infra:
+  cache:
+    enabled: false
+  file:
+    upload-path: /tmp/dev/uploads

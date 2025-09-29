@@ -1,0 +1,100 @@
+# ==================================================================================
+# 博客系统核心文章管理模块 - 生产环境配置
+# ==================================================================================
+# 环境：Production
+# 说明：生产环境专用配置，高安全性、高性能、监控完善
+# 特点：精简日志、禁用调试、外部化敏感配置、性能优化
+# ==================================================================================
+
+# --- 服务器配置 ---
+server:
+  port: ${SERVER_PORT:8080}
+
+# --- Spring 框架配置 ---
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      minimum-idle: ${DB_POOL_MIN_IDLE:10}
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:50}
+      idle-timeout: ${DB_POOL_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_POOL_MAX_LIFETIME:1800000}
+      connection-timeout: ${DB_POOL_CONNECTION_TIMEOUT:30000}
+      pool-name: BlogArticleHikariCP-PROD
+
+  # --- JPA 配置 ---
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+# --- MyBatis-Plus 生产配置 ---
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+
+# --- 日志配置 ---
+logging:
+  level:
+    root: WARN
+    com.zm.blog: INFO
+    org.springframework.web: ERROR
+    org.hibernate.SQL: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+  file:
+    name: ${LOG_FILE:/var/log/blog-article-service/app.log}
+
+# --- Swagger 配置（生产环境禁用） ---
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# --- Actuator 配置 ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${ACTUATOR_ENDPOINTS:health,info,prometheus}
+  endpoint:
+    health:
+      show-details: never
+  metrics:
+    export:
+      prometheus:
+        enabled: ${PROMETHEUS_ENABLED:true}
+
+# --- 跨域配置 ---
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}
+  allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE}
+  allowed-headers: ${CORS_ALLOWED_HEADERS:Content-Type,Authorization}
+  allow-credentials: ${CORS_ALLOW_CREDENTIALS:false}
+  max-age: ${CORS_MAX_AGE:86400}
+
+# --- JWT 生产配置 ---
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:3600}
+
+# --- 功能配置 ---
+feature:
+  article:
+    max-title-length: ${ARTICLE_MAX_TITLE_LENGTH:200}
+    max-content-length: ${ARTICLE_MAX_CONTENT_LENGTH:100000}
+    auto-save-interval: ${ARTICLE_AUTO_SAVE_INTERVAL:120}
+
+# --- 基础设施配置 ---
+infra:
+  cache:
+    enabled: ${CACHE_ENABLED:true}
+    ttl: ${CACHE_TTL:7200}
+  file:
+    upload-path: ${FILE_UPLOAD_PATH:/var/app/uploads}
+    max-size: ${FILE_MAX_SIZE:20MB}

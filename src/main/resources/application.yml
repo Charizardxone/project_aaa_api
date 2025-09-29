@@ -1,5 +1,146 @@
+# ==================================================================================
+# 博客系统核心文章管理模块 - 主配置文件
+# ==================================================================================
+# 版本：v0.1.0
+# 创建时间：2025-09-25
+# 说明：本文件包含通用配置，具体环境差异由对应的 profile 文件覆盖
+# ==================================================================================
+
+# --- Spring 框架配置 ---
 spring:
-    application:
-        name: blog
+  application:
+    name: blog-article-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  # --- 数据源配置占位符 ---
+  datasource:
+    driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/blog_db?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai}
+    username: ${DB_USERNAME:blog_user}
+    password: ${DB_PASSWORD:your_password_here}
+    hikari:
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:20}
+      idle-timeout: ${DB_POOL_IDLE_TIMEOUT:300000}
+      pool-name: BlogArticleHikariCP
+
+  # --- JPA 配置占位符 ---
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:validate}
+    show-sql: ${JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+  # --- 国际化配置 ---
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    cache-duration: 3600
+
+  # --- 验证配置 ---
+  validation:
+    enabled: true
+
+# --- 应用版本信息 ---
+app:
+  version: 0.1.0
+  name: 博客系统核心文章管理模块
+  description: 提供文章创建、编辑、发布等核心功能的微服务
+  build-time: ${BUILD_TIME:unknown}
+
+# --- 服务器基础配置 ---
 server:
-    port: 8080
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: ${SERVER_CONTEXT_PATH:/api/v1}
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  shutdown: graceful
+
+# --- MyBatis-Plus 配置 ---
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  mapper-locations: classpath*:/mapper/**/*.xml
+
+# --- JWT 配置占位符 ---
+jwt:
+  secret: ${JWT_SECRET:your_jwt_secret_key_at_least_256_bits_long}
+  expiration: ${JWT_EXPIRATION:86400}
+  header: ${JWT_HEADER:Authorization}
+  prefix: ${JWT_PREFIX:Bearer }
+
+# --- 跨域配置 ---
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:8081}
+  allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,OPTIONS}
+  allowed-headers: ${CORS_ALLOWED_HEADERS:*}
+  allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}
+  max-age: ${CORS_MAX_AGE:3600}
+
+# --- Swagger/OpenAPI 配置 ---
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:true}
+    path: /api-docs
+  swagger-ui:
+    enabled: ${SWAGGER_UI_ENABLED:true}
+    path: /swagger-ui.html
+
+# --- 日志配置 ---
+logging:
+  level:
+    root: ${LOG_LEVEL_ROOT:INFO}
+    com.zm.blog: ${LOG_LEVEL_APP:INFO}
+    org.springframework.web: ${LOG_LEVEL_SPRING_WEB:INFO}
+    org.hibernate.SQL: ${LOG_LEVEL_SQL:WARN}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_SQL_PARAMS:WARN}
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+  file:
+    name: ${LOG_FILE:logs/blog-article-service.log}
+
+# --- Actuator 监控配置 ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${ACTUATOR_ENDPOINTS:health,info,metrics,prometheus}
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: ${ACTUATOR_HEALTH_DETAILS:when-authorized}
+  metrics:
+    export:
+      prometheus:
+        enabled: ${PROMETHEUS_ENABLED:false}
+
+# --- 功能模块配置命名空间 ---
+feature:
+  article:
+    max-title-length: ${ARTICLE_MAX_TITLE_LENGTH:200}
+    max-content-length: ${ARTICLE_MAX_CONTENT_LENGTH:50000}
+    auto-save-interval: ${ARTICLE_AUTO_SAVE_INTERVAL:30}
+
+# --- 基础设施配置命名空间 ---
+infra:
+  cache:
+    enabled: ${CACHE_ENABLED:true}
+    ttl: ${CACHE_TTL:3600}
+  file:
+    upload-path: ${FILE_UPLOAD_PATH:/tmp/uploads}
+    max-size: ${FILE_MAX_SIZE:10MB}
